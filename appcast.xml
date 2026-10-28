@@ -1,0 +1,16 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Underpressured</title>
+        <item>
+            <title>1.0.0</title>
+            <pubDate>Wed, 28 Oct 2026 23:56:42 +0400</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h2>Underpressured 1.0.0</h2><ul><li>First release with automatic updates.</li></ul>
+]]></description>
+            <enclosure url="https://github.com/a-dev/underpressured/releases/download/1.0.0-1/Underpressured-1.0.0-1.zip" length="4107696" type="application/octet-stream" sparkle:edSignature="JCLTL+drrwBWmStmlnWNKTL67al1Smh2Cq03AjaKIXbUWs2cIYWhl12xw74DrBo7OfLtaPkc70yW83pwiwXaBQ=="/>
+        </item>
+    </channel>
+</rss>
