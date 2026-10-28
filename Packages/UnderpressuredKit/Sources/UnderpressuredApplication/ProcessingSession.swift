@@ -89,10 +89,12 @@ public final class ProcessingSession {
             guard scanGeneration == generation, !Task.isCancelled else { return }
             let exportFolder: URL? = if case .exportFolder(let url) = captured.destination { url } else { nil }
             let intake = intake
-            let scan = Task.detached { intake(urls, exportFolder, { _ in false }) }
-            let result = await withTaskCancellationHandler {
-                await scan.value
-            } onCancel: { scan.cancel() }
+            // The scanner blocks on filesystem calls, so it runs outside the cooperative pool.
+            let result = await withCheckedContinuation { continuation in
+                DispatchQueue.global(qos: .userInitiated).async {
+                    continuation.resume(returning: intake(urls, exportFolder, { _ in false }))
+                }
+            }
             guard scanGeneration == generation, !Task.isCancelled else { return }
             onEvent?(.scanFailures(result.failures))
             let batch = Batch(activePreset: captured.preset, outputFormat: captured.outputFormat,

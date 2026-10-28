@@ -164,7 +164,12 @@ Use [bench/README.md](../bench/README.md) for codec comparisons and corpus setup
 It uses the ephemeral hosted arm64 `xcode-27` runner with read-only repository permissions.
 It cancels older work for the same ref. Never route fork code to a persistent self-hosted runner.
 
-The workflow runs `scripts/test.sh`, then the seven-language UI companion.
+Pull requests run the fast gate, `scripts/test.sh --fast`.
+It runs the script fixtures, the architecture check, Rust, native dependencies and the package tests.
+Pushes to `main`, tags, manual runs and pull requests labelled `full-ci` run the full gate.
+The full gate is `scripts/test.sh`, then the seven-language UI companion.
+Add `full-ci` to pull requests that change the app target, localization, UI or release signing.
+Changes limited to `docs/**` and Markdown files skip CI.
 Its final upload step retains available evidence after success or failure.
 An early failure leaves later checks unexecuted.
 A real server-side run and required branch protection remain unverified.

@@ -2,7 +2,15 @@
 # Runs the full Underpressured test suite: native deps, the UnderpressuredKit package tests,
 # then the app's xcodebuild tests. This is the single command CI and developers run.
 # Pipes through xcbeautify when it is installed; otherwise prints raw xcodebuild output.
+# --fast stops after the package tests: no app build, catalog audit or release signature.
 set -euo pipefail
+
+FAST=0
+case "${1:-}" in
+  --fast) FAST=1 ;;
+  "") ;;
+  *) printf 'usage: %s [--fast]\n' "$0" >&2; exit 2 ;;
+esac
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
@@ -51,6 +59,10 @@ run build-deps scripts/build-deps.sh
 # from satisfying the actual-catalog audit.
 run swift-package swift test --package-path Packages/UnderpressuredKit \
   --scratch-path "$RUN_ROOT/package"
+if [ "$FAST" = 1 ]; then
+  step "fast tests passed (results: $RUN_ROOT/results.tsv)"
+  exit 0
+fi
 export UP_UI_ARTIFACTS="$RUN_ROOT/native-ui"
 export TEST_RUNNER_UP_UI_ARTIFACTS="$UP_UI_ARTIFACTS"
 run native-app xcodebuild test \

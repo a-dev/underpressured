@@ -2,11 +2,16 @@ name: CI
 
 # Always use an ephemeral hosted arm64 runner, including for fork PRs.
 # Never route untrusted PR code through the persistent CI_RUNNER fallback.
+# Pull requests run the fast gate; the `full-ci` label, main, tags and manual runs add the app,
+# catalog, release-signature and seven-language UI checks. Docs-only changes skip CI.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
+    paths-ignore: ['docs/**', '**/*.md']
   push:
     branches: [main]
     tags: ['**']
+    paths-ignore: ['docs/**', '**/*.md']
   workflow_dispatch:
 
 permissions:
@@ -21,6 +26,12 @@ jobs:
     runs-on: xcode-27
     timeout-minutes: 60
     steps:
+      - name: Choose gate
+        id: gate
+        env:
+          FULL: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'full-ci') }}
+        run: echo "full=$FULL" >> "$GITHUB_OUTPUT"
+
       - name: Checkout
         uses: actions/checkout@v5
 
@@ -64,10 +75,11 @@ jobs:
       - name: Test
         env:
           UP_TEST_ARTIFACTS: ${{ runner.temp }}/test-gate
-        run: scripts/test.sh
+        run: scripts/test.sh ${{ steps.gate.outputs.full == 'true' && '' || '--fast' }}
 
-      # Run on every gate, so UI/localization PRs and release tags both retain evidence.
+      # Runs on every full gate, so release tags and `full-ci` PRs retain UI and localization evidence.
       - name: Seven-language native UI companion
+        if: steps.gate.outputs.full == 'true'
         env:
           UP_UI_ARTIFACTS: ${{ runner.temp }}/localized-ui
         run: scripts/check-localized-ui.sh
