@@ -23,6 +23,7 @@
 		A20000000000000000000017 /* UnderpressuredApplication in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000097 /* UnderpressuredApplication */; };
 		A20000000000000000000018 /* MacPlatform in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000098 /* MacPlatform */; };
 		A20000000000000000000019 /* Resources/container-migration.plist in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000025 /* Resources/container-migration.plist */; };
+		A2000000000000000000001A /* Resources/PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000026 /* Resources/PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +42,7 @@
 		A10000000000000000000023 /* Config/Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Version.xcconfig; sourceTree = SOURCE_ROOT; };
 		A10000000000000000000024 /* Resources/Acknowledgements.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Resources/Acknowledgements.txt; sourceTree = SOURCE_ROOT; };
 		A10000000000000000000025 /* Resources/container-migration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Resources/container-migration.plist"; sourceTree = SOURCE_ROOT; };
+		A10000000000000000000026 /* Resources/PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Resources/PrivacyInfo.xcprivacy; sourceTree = SOURCE_ROOT; };
 		A20000000000000000000021 /* UnderpressuredUpdaterFree.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UnderpressuredUpdaterFree.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -101,6 +103,7 @@
 				A10000000000000000000023 /* Config/Version.xcconfig */,
 				A10000000000000000000024 /* Resources/Acknowledgements.txt */,
 				A10000000000000000000025 /* Resources/container-migration.plist */,
+				A10000000000000000000026 /* Resources/PrivacyInfo.xcprivacy */,
 				A10000000000000000000031 /* App */,
 				A10000000000000000000032 /* AppTests */,
 				A10000000000000000000003 /* Products */,
@@ -274,6 +277,7 @@
 			files = (
 				A20000000000000000000016 /* Resources/Acknowledgements.txt in Resources */,
 				A20000000000000000000019 /* Resources/container-migration.plist in Resources */,
+				A2000000000000000000001A /* Resources/PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,7 +392,7 @@
 				INFOPLIST_FILE = "$(DERIVED_FILE_DIR)/Direct-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Underpressured;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Andrei Dementev";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -412,7 +416,7 @@
 				INFOPLIST_FILE = "$(DERIVED_FILE_DIR)/Direct-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Underpressured;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Andrei Dementev";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -471,8 +475,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Underpressured;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Andrei Dementev";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -494,8 +499,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Underpressured;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Andrei Dementev";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

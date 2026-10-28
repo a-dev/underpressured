@@ -21,7 +21,7 @@ Later builds reuse `Vendor/.stamp` when inputs match.
 | `Underpressured` | Direct distribution with Sparkle 2.10.0 |
 | `UnderpressuredUpdaterFree` | No Sparkle, helpers, update configuration, or `DIRECT_DISTRIBUTION` code |
 
-The updater-free target shares app sources and package products. It enables the App Sandbox with `Config/UpdaterFree.entitlements`: user-selected read-write files and app-scoped bookmarks.
+The updater-free target shares app sources and package products. It enables the App Sandbox with `Config/UpdaterFree.entitlements`: user-selected read-write files and app-scoped bookmarks. Only this target ships `Resources/PrivacyInfo.xcprivacy` and sets `ITSAppUsesNonExemptEncryption` to `NO`. The manifest declares no tracking and no collected data. It gives reason `CA92.1` for `UserDefaults`, which holds the app's own settings. It gives reason `3B52.1` for file timestamps, which the app reads only from images and folders the user opened or dropped. Update the manifest when the app starts using another required-reason API.
 Debug builds disable updates unless explicit fixture settings enable them.
 Disabled updates show no controls and send no requests.
 
