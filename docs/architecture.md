@@ -11,18 +11,18 @@ Package paths below are relative to `Packages/UnderpressuredKit/Sources/`.
 | Location                                            | Owner and responsibility                                                                                          |
 | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `UnderpressuredCore/`                               | Presets, constrained values, captured batch settings, source facts, outcomes, format decisions, and mark matching |
-| `UnderpressuredApplication/ProcessingSession.swift` | Intake order, pending scans, cancellation generations, Run activity, and exclusive idle operations                |
+| `UnderpressuredApplication/ProcessingSession.swift` | Intake order, pending scans, folder-access requests, cancellation generations, Run activity, and idle operations |
 | `UnderpressuredApplication/Queue/`                  | Atomic admission, source exclusion, execution records, worker cancellation, and pixel accounting                  |
 | `UnderpressuredApplication/Pipeline/`               | Processing stages and file-commit sequencing                                                                      |
-| `UnderpressuredApplication/Rules/`                  | Folder scanning and output-path planning                                                                          |
-| `UnderpressuredApplication/Boundaries/`             | File and codec ports                                                                                              |
+| `UnderpressuredApplication/Rules/`                  | Folder scanning, output-path planning, and the folders a conversion beside a loose file needs                    |
+| `UnderpressuredApplication/Boundaries/`             | File, codec, and folder-access ports                                                                              |
 | `AppModel/`                                         | Observable projections, preset interactions, selection, localization, and undo                                    |
 | `LocalFileSystem/`                                  | File operations, OS content classification, and optimization-mark serialization                                   |
 | `ImageEngine/`                                      | ImageIO transforms, native codec wrappers, JPEG rewriting, and PNG palette search                                 |
 | `MacPlatform/`                                      | Saved-settings mappings, notifications, sleep prevention, and processor probes                                    |
 | `SoakHarness/`                                      | Executable for soak and performance scripts                                                                       |
 
-`App/` contains SwiftUI views, AppKit integration, dialogs, and Quick Look.
+`App/` contains SwiftUI views, AppKit integration, dialogs, the folder-access panel, and Quick Look.
 `App/AppWiring.swift` constructs the model, services, and adapters.
 `native/up-jpegli/` and `rust/up-codecs/` provide C interfaces to the native codecs.
 `Vendor/` contains generated XCFrameworks and is excluded from Git.
@@ -106,6 +106,7 @@ Native failures use an ImageIO fallback only when it meets the requested fidelit
 
 Temporary files use the destination volume. LocalFileSystem writes them to one item-replacement folder per volume, because a sandboxed app may have access to a target file but not to its folder. When a volume offers no such folder, the temporary file goes next to the target. Commit rechecks source identity, size, and modification date.
 Marked replacement also requires the expected destination version.
+A dropped file grants a sandboxed app that file, not its folder. Before admission, ProcessingSession asks the `FolderAccess` port for each folder in which Replace Originals will create a converted file beside a loose source and where the app cannot create files. `SiblingOutputFolders` selects the folders from each Item's scanned format. The Queue and Pipeline never wait for the user. `App/FolderAccessPanel.swift` implements the port with `NSOpenPanel`. Its check uses `access(2)`, which reports sandbox grants, so it needs no sandbox API. Tests and the default use `UnrestrictedFolderAccess`. A refused panel leaves commit semantics unchanged: the conversion fails with No permission.
 Each file commits independently. Cancellation and later source-cleanup failures cannot remove a committed output.
 
 MacPlatform maps versioned settings into valid domain values. It stores the Export folder as a security-scoped bookmark and as the plain path that earlier builds read. It uses the path when the bookmark is missing or cannot be resolved. It keeps security-scoped access to a resolved folder for the life of the process. LocalFileSystem owns versioned JSON and optimization-mark extended attributes.

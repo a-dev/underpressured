@@ -106,6 +106,8 @@ Move original to Trash appears beside replacement controls only in replacement m
 
 Replace originals writes a same-format result atomically at the source path. Conversion writes a sibling file before removing the source.
 
+A sandboxed app can have access to a dropped file but not to its folder, and a conversion must create a new file there. After scanning and before admission, intake finds the folders of loose files that it will convert. For each folder where the app cannot create files, a folder panel opens at that folder with a Grant Access button. One panel appears for each folder, in intake order. Files inside dropped folders, Export Copies, same-format results, and the direct-distribution app never show the panel. If the user cancels the panel, the items are still admitted, and their conversions fail with No permission. Cancel while the panel is open discards that intake when the panel closes.
+
 Move originals to Trash sends replaced sources to the Trash. A volume without Trash produces a failure. Skipped sources remain untouched.
 
 At constrained widths, the export-folder name truncates in the middle so Clear remains visible. The folder control exposes its full path through help and its accessibility value.

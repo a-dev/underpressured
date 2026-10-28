@@ -21,7 +21,7 @@ Use these terms in code and documentation. [Architecture](architecture.md) defin
 | ProcessingSession | Application service that owns intake ordering, pending scans, cancellation generations, admission tracking and exclusive idle-operation reservations. It reports Run activity to presentation without waiting for UI throttling. |
 | Remembered destination preferences | The selected destination kind, export-folder path and Trash choice saved between app sessions. A missing folder choice cannot produce an intake Destination. A remembered unavailable path stays remembered and processing reports its destination failure. |
 | Queue execution interval | An application lifetime from admission until admitted work drains. Queue owns its output reservations and folder checks through QueueExecutionContext. Active workers keep them alive through cancellation. A Run can span several intervals. |
-| Item | One image within a batch, with an immutable source URL, captured source identity and dropped root. Intake and presentation hold state values. Queue owns the authoritative execution lifecycle. |
+| Item | One image within a batch, with an immutable source URL, captured source identity, dropped root and scanned format. Intake and presentation hold state values. Queue owns the authoritative execution lifecycle. |
 | Outcome | Optimized, Skipped, Failed, or Cancelled. |
 | Optimized | The app wrote a compressed, resized, or converted image. |
 | Skipped | Processing deliberately left the image unchanged. Export may receive an unchanged copy. |

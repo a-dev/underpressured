@@ -1591,6 +1591,59 @@
         }
       }
     },
+    "Grant Access" : {
+      "comment" : "Action button in the folder panel that grants access to the folder of a dropped file.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "منح الوصول"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zugriff gewähren"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant Access"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conceder acceso"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser l’accès"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセスを許可"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conceder acesso"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授予访问权限"
+          }
+        }
+      }
+    },
     "Keep Running" : {
       "comment" : "App interface label or action. Match the platform terminology and keep action verbs concise.",
       "localizations" : {
@@ -3122,6 +3175,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "本应用已翻译为英语、西班牙语、巴西葡萄牙语、德语、法语、阿拉伯语、日语和简体中文。请在系统设置中更改语言。"
+          }
+        }
+      }
+    },
+    "To save converted images next to the originals, Underpressured needs access to “%@”." : {
+      "comment" : "Message in the folder panel shown before converting dropped files with Replace Originals. Placeholder is a folder name.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لحفظ الصور المحوّلة بجانب الملفات الأصلية، يحتاج Underpressured إلى الوصول إلى «%@»."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um konvertierte Bilder neben den Originalen zu sichern, benötigt Underpressured Zugriff auf „%@“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To save converted images next to the originals, Underpressured needs access to “%@”."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para guardar las imágenes convertidas junto a los originales, Underpressured necesita acceso a “%@”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour enregistrer les images converties à côté des originaux, Underpressured a besoin d’accéder à « %@ »."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "変換した画像をオリジナルの隣に保存するには、Underpressured に「%@」へのアクセスを許可する必要があります。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para salvar as imagens convertidas ao lado dos originais, o Underpressured precisa de acesso a “%@”."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要将转换后的图像保存在原文件旁边，Underpressured 需要访问“%@”。"
           }
         }
       }

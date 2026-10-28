@@ -232,7 +232,10 @@ Record the commit, macOS version, reviewer, date, and result. All checks remain 
 | --- | --- |
 | Drop one file. Replace Originals, Trash on and off, original format. | The file is replaced. No `.tmp` file appears in its folder. |
 | Drop one file on an external volume. Replace Originals. | The file is replaced. |
-| Drop one file. Replace Originals with a different output format. | Known gap: the new sibling file needs folder access. Expect "No permission" until a design grants it. |
-| Drop a folder. Replace Originals with a different output format. | Outputs appear beside their sources. |
+| Drop one file. Replace Originals with a different output format. Click Grant Access. | A folder panel opens at the file's folder with a Grant Access button. The converted file appears beside the source. |
+| Drop one file. Replace Originals with a different output format. Cancel the panel. | The item fails with "No permission". The source is unchanged. |
+| Drop two files from one folder and one from another. Replace Originals with a different output format. | One panel appears for each folder. |
+| Drop one file. Replace Originals with the original format. | No panel appears. |
+| Drop a folder. Replace Originals with a different output format. | No panel appears. Outputs appear beside their sources. |
 | Choose an Export folder, quit, relaunch, and process. | The remembered folder is used without a new prompt. |
 | Run a direct build with an Export folder, then the sandboxed build. | The sandboxed build reads its own container, so it starts with initial settings. Container migration is not designed yet. |
