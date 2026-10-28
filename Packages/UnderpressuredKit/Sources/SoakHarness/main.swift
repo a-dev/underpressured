@@ -358,7 +358,7 @@ func run() async throws {
         let settled = physFootprint() / 1_048_576
         result.stuck = (await queue.diagnostics).items
         let tree = allFiles(in: config.root).filter { !$0.path.hasPrefix(masters.path) }
-        result.temporaries = tree.filter { $0.pathExtension == "tmp" }.map(\.lastPathComponent)
+        result.temporaries = (tree.filter { $0.pathExtension == "tmp" } + files.pendingTemporaryFiles).map(\.lastPathComponent)
         let visible = tree.filter { ["jpg", "jpeg", "png"].contains($0.pathExtension.lowercased()) }
         result.partials = visible.filter { !decodesCompletely($0) }.map(\.lastPathComponent)
         log("round \(round) (\(delayText)): \(result.counts) stuck=\(result.stuck) tmp=\(result.temporaries.count) "

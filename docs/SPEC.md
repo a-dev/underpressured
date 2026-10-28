@@ -6,7 +6,7 @@ Underpressured compresses, resizes, and converts still images in batches. All pr
 
 ## 2. Platform
 
-The app targets Apple Silicon and macOS 27 or later. The app is not sandboxed. See [Release](release.md) for signing and distribution.
+The app targets Apple Silicon and macOS 27 or later. The direct-distribution app is not sandboxed. The updater-free app runs in the App Sandbox. See [Release](release.md) for signing and distribution.
 
 ## 3. Main window
 
@@ -100,7 +100,7 @@ Conversion uses `.jpg` or `.png`. Original output preserves the source extension
 
 ## 6. Destination
 
-The Destination control shows both Replace Originals and Export Copies. Export Copies reuses the remembered folder when it exists, is a directory, and is writable. Otherwise, it requests a folder. Cancelling leaves the previous destination unchanged. The folder menu offers Choose Another Folder, Show in Finder, and Forget Folder. Forget Folder selects replacement and clears the remembered folder.
+The Destination control shows both Replace Originals and Export Copies. Export Copies reuses the remembered folder when it exists, is a directory, and is writable. Otherwise, it requests a folder. A sandboxed app that cannot reopen the remembered folder after relaunch also requests it. Cancelling leaves the previous destination unchanged. The folder menu offers Choose Another Folder, Show in Finder, and Forget Folder. Forget Folder selects replacement and clears the remembered folder.
 
 Move original to Trash appears beside replacement controls only in replacement mode. Its preference survives mode changes. Destination changes affect later intake only.
 
@@ -120,7 +120,7 @@ An existing export with a valid optimization mark can be refreshed. Unrelated fi
 
 For example, two same-name images admitted during overlapping processing receive distinct reserved paths, even if the first finishes before the second writes. If processing drains while a later intake is still scanning, that later batch uses fresh reservations and may refresh the earlier valid marked export. Both batches can still belong to one run for completion totals. Historical row output paths refer to the current file at that location, not an archived version of its bytes.
 
-Writes use temporary files on the destination volume. Before committing, the pipeline checks the source's identity, size, and modification date.
+Writes use temporary files on the destination volume, outside the destination folder. Before committing, the pipeline checks the source's identity, size, and modification date.
 
 Written files retain source dates, Finder tags, and permissions. A changed source produces a failure instead of a replacement.
 

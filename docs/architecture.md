@@ -104,11 +104,11 @@ Native failures use an ImageIO fallback only when it meets the requested fidelit
 
 ## Files and storage
 
-Temporary files use the destination volume. Commit rechecks source identity, size, and modification date.
+Temporary files use the destination volume. LocalFileSystem writes them to one item-replacement folder per volume, because a sandboxed app may have access to a target file but not to its folder. When a volume offers no such folder, the temporary file goes next to the target. Commit rechecks source identity, size, and modification date.
 Marked replacement also requires the expected destination version.
 Each file commits independently. Cancellation and later source-cleanup failures cannot remove a committed output.
 
-MacPlatform maps versioned settings into valid domain values. LocalFileSystem owns versioned JSON and optimization-mark extended attributes.
+MacPlatform maps versioned settings into valid domain values. It stores the Export folder as a security-scoped bookmark and as the plain path that earlier builds read. It uses the path when the bookmark is missing or cannot be resolved. It keeps security-scoped access to a resolved folder for the life of the process. LocalFileSystem owns versioned JSON and optimization-mark extended attributes.
 Application commit tokens retain opaque expected mark bytes.
 Preserve stored keys, preset IDs, order, starter identifiers, legacy defaults, and compatible mark payloads.
 Batch and item execution state does not persist.

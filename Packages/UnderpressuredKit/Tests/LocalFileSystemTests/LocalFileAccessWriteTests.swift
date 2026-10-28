@@ -58,12 +58,31 @@ final class LocalFileAccessWriteTests {
 
     // MARK: Temporary file
 
-    @Test func temporaryFile_spec7_3_isHiddenNextToTheTarget() throws {
+    /// A sandboxed app may hold access to the target alone, so the temporary file stays out of the target's folder.
+    @Test func temporaryFile_spec7_3_isHiddenOnTheTargetVolumeOutsideItsFolder() throws {
         let temp = try access.writeTemporaryFile(Data("new".utf8), near: url("photo.jpg"))
-        #expect(temp.deletingLastPathComponent().standardizedFileURL == root.standardizedFileURL)
+        let second = try access.writeTemporaryFile(Data("other".utf8), near: url("other.jpg"))
+        #expect(temp.deletingLastPathComponent().standardizedFileURL != root.standardizedFileURL)
+        #expect(second.deletingLastPathComponent() == temp.deletingLastPathComponent())
+        #expect(try access.attributes(of: temp).volumeIdentity == access.attributes(of: root).volumeIdentity)
         #expect(temp.lastPathComponent.hasPrefix("."))
         #expect(try Data(contentsOf: temp) == Data("new".utf8))
         #expect(try access.attributes(of: temp).isHidden)
+        #expect(Set(access.pendingTemporaryFiles.map(\.lastPathComponent)) == [temp.lastPathComponent, second.lastPathComponent])
+
+        try access.moveItem(at: temp, to: url("photo.jpg"))
+        try access.removeItem(at: second)
+        #expect(access.pendingTemporaryFiles.isEmpty)
+        #expect(try visibleNames() == ["photo.jpg"])
+    }
+
+    @Test func temporaryFile_aRemovedReusedFolderIsReplaced() throws {
+        let first = try access.writeTemporaryFile(Data("a".utf8), near: url("photo.jpg"))
+        try FileManager.default.removeItem(at: first.deletingLastPathComponent())
+        let second = try access.writeTemporaryFile(Data("b".utf8), near: url("photo.jpg"))
+        #expect(try Data(contentsOf: second) == Data("b".utf8))
+        #expect(second.deletingLastPathComponent().standardizedFileURL != root.standardizedFileURL)
+        try access.removeItem(at: second)
     }
 
     @Test func readOnlyFolder_spec7_8_noPermissionToWriteHere() throws {
@@ -72,9 +91,11 @@ final class LocalFileAccessWriteTests {
         try Data("x".utf8).write(to: folder.appendingPathComponent("photo.jpg"))
         try FileManager.default.setAttributes([.posixPermissions: 0o555], ofItemAtPath: folder.path)
 
+        let temp = try access.writeTemporaryFile(Data("new".utf8), near: folder.appendingPathComponent("photo.webp"))
         #expect(throws: FileAccessError.permissionDenied) {
-            _ = try self.access.writeTemporaryFile(Data("new".utf8), near: folder.appendingPathComponent("photo.jpg"))
+            try self.access.moveItem(at: temp, to: folder.appendingPathComponent("photo.webp"))
         }
+        try access.removeItem(at: temp)
         #expect(throws: FileAccessError.permissionDenied) {
             try self.access.createDirectory(at: folder.appendingPathComponent("sub"))
         }

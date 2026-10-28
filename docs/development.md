@@ -21,7 +21,7 @@ Later builds reuse `Vendor/.stamp` when inputs match.
 | `Underpressured` | Direct distribution with Sparkle 2.10.0 |
 | `UnderpressuredUpdaterFree` | No Sparkle, helpers, update configuration, or `DIRECT_DISTRIBUTION` code |
 
-The updater-free target shares app sources and package products. It does not enable sandboxing.
+The updater-free target shares app sources and package products. It enables the App Sandbox with `Config/UpdaterFree.entitlements`: user-selected read-write files and app-scoped bookmarks.
 Debug builds disable updates unless explicit fixture settings enable them.
 Disabled updates show no controls and send no requests.
 
@@ -222,3 +222,17 @@ Repeat layout checks at minimum window width. Use VoiceOver for speech checks.
 
 The [coverage map](../Packages/UnderpressuredKit/Tests/COVERAGE.md) locates automated assertions and diagnostic captures.
 Passing accessibility assertions does not establish VoiceOver speech or physical gesture quality.
+
+## Sandboxed app checks
+
+Run these with a signed `UnderpressuredUpdaterFree` build. Package tests run without the App Sandbox, so they cannot show sandbox denials.
+Record the commit, macOS version, reviewer, date, and result. All checks remain pending until a person records a result.
+
+| Check | Expected behavior |
+| --- | --- |
+| Drop one file. Replace Originals, Trash on and off, original format. | The file is replaced. No `.tmp` file appears in its folder. |
+| Drop one file on an external volume. Replace Originals. | The file is replaced. |
+| Drop one file. Replace Originals with a different output format. | Known gap: the new sibling file needs folder access. Expect "No permission" until a design grants it. |
+| Drop a folder. Replace Originals with a different output format. | Outputs appear beside their sources. |
+| Choose an Export folder, quit, relaunch, and process. | The remembered folder is used without a new prompt. |
+| Run a direct build with an Export folder, then the sandboxed build. | The sandboxed build reads its own container, so it starts with initial settings. Container migration is not designed yet. |

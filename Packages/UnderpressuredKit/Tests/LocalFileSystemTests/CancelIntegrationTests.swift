@@ -109,7 +109,8 @@ final class CancelIntegrationTests {
         let pathsBefore = allPaths()
 
         let codec = PausableCodec(pauseAt: call)
-        let pipeline = Pipeline(fileAccess: LocalFileAccess(), codec: codec)
+        let access = LocalFileAccess()
+        let pipeline = Pipeline(fileAccess: access, codec: codec)
         let queue = Queue(parallelism: 1, pixelBudget: .max, pipeline: pipeline.itemPipeline)
         let idle = Task { await QueueEventHistory.collect(untilIdle: queue.events) }
         let batch = Batch(
@@ -126,6 +127,7 @@ final class CancelIntegrationTests {
         let outcome = history.batches.first?.items.first?.state
         #expect(outcome == .finished(.cancelled))
         #expect(allPaths() == pathsBefore, "no temporary file, no partial output")
+        #expect(access.pendingTemporaryFiles.isEmpty, "no temporary file")
         #expect(try Data(contentsOf: source) == sourceBytes)
         let after = try LocalFileAccess().attributes(of: source)
         #expect(after.modificationDate == before.modificationDate)
@@ -172,6 +174,7 @@ extension CancelIntegrationTests {
         #expect((try? Data(contentsOf: target)) == remaining)
         #expect(try Data(contentsOf: source) == sourceBytes)
         #expect(!allPaths().contains { $0.hasSuffix(".tmp") })
+        #expect(access.pendingTemporaryFiles.isEmpty)
     }
 }
 
@@ -203,6 +206,7 @@ extension CancelIntegrationTests {
         let history = await QueueEventHistory.collect(untilIdle: queue.events)
         #expect(history.batches.first?.items.first?.state == .finished(.cancelled))
         #expect(allPaths() == before)
+        #expect(access.pendingTemporaryFiles.isEmpty)
         #expect(try Data(contentsOf: source) == sourceBytes)
     }
 }
@@ -248,5 +252,6 @@ extension CancelIntegrationTests {
         #expect(try Data(contentsOf: output) == (path == "normal" ? sourceBytes.prefix(sourceBytes.count / 2) : sourceBytes))
         #expect(try Data(contentsOf: source) == sourceBytes)
         #expect(!allPaths().contains { $0.hasSuffix(".tmp") })
+        #expect(access.pendingTemporaryFiles.isEmpty)
     }
 }

@@ -47,6 +47,8 @@ Cancellation stress pins fixture dates to whole seconds and replays delay choice
 | Intake cancellation and exclusive idle handoff | `UnderpressuredApplicationTests/ProcessingSessionTests.swift`, `AppModelTests/IdleOperationTests.swift`, `QuitTests.swift`, `AppTests/UpdateInstallationTests.swift` |
 | Reservation lifetime and bounded execution | `UnderpressuredApplicationTests/RunReservationTests.swift`, `ExecutionRetentionTests.swift`, `PixelBudgetTests.swift` |
 | Committed output survives cancellation and source-cleanup failure | `UnderpressuredApplicationTests/WriteFailureCancellationTests.swift`, `PipelineTests.swift`, `LocalFileSystemTests/LocalFileAccessWriteTests.swift` |
+| Temporary files on the target volume outside the target folder, reuse, replacement of a removed folder, and leftover checks | `LocalFileSystemTests/LocalFileAccessWriteTests.swift`, `CancelIntegrationTests.swift`, `IntegrationTests/CancelStressTests.swift`, `EndToEndTests.swift` |
+| Export-folder bookmark: moved folder, path fallback, legacy path key | `MacPlatformTests/SettingsStoreTests.swift` |
 | Stored settings and mark compatibility | `MacPlatformTests/PresetStorageTests.swift`, `SettingsStoreTests.swift`, `LocalFileSystemTests/StoredOptimizationMarkTests.swift` |
 | Target dependencies, imports, and source ownership | `scripts/check-architecture.py`, `scripts/test_check_architecture.py` |
 
