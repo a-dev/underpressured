@@ -38,9 +38,10 @@ jobs:
       - name: Select Xcode 27
         run: |
           set -euo pipefail
-          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' | sort -V | tail -n 1)"
+          # Stable releases only: SwiftUI accessibility differs under pre-release SDKs (27.2 RC exposes no AX tree to the UI tests).
+          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' | grep -viE 'beta|release_candidate|_rc' | sort -V | tail -n 1 || true)"
           if [ -z "$xcode" ]; then
-            echo "::error::Xcode 27 is not installed on this runner image (no /Applications/Xcode_27*.app). Check the hosted xcode-27 image inventory; do not route fork PRs to a persistent runner."
+            echo "::error::No stable Xcode 27 is installed on this runner image (no /Applications/Xcode_27*.app without Beta/RC). Check the hosted xcode-27 image inventory; do not route fork PRs to a persistent runner."
             exit 1
           fi
           echo "Selecting $xcode"
@@ -75,7 +76,8 @@ jobs:
       - name: Test
         env:
           UP_TEST_ARTIFACTS: ${{ runner.temp }}/test-gate
-        run: scripts/test.sh ${{ steps.gate.outputs.full == 'true' && '' || '--fast' }}
+        # `cond && '' || x` always yields x because '' is falsy in Actions expressions.
+        run: scripts/test.sh ${{ steps.gate.outputs.full != 'true' && '--fast' || '' }}
 
       # Runs on every full gate, so release tags and `full-ci` PRs retain UI and localization evidence.
       - name: Seven-language native UI companion
