@@ -4,6 +4,7 @@ Start with the guide for your task.
 
 | Guide                                           | Contents                                                          |
 | ----------------------------------------------- | ----------------------------------------------------------------- |
+| [Contributing](contribution.md)                 | Building from source, tests, translations, and where to start     |
 | [App behavior](SPEC.md)                         | Presets, formats, destinations, processing, and recovery rules    |
 | [Architecture](architecture.md)                 | Module owners, execution lifetimes, storage, and source locations |
 | [Glossary](GLOSSARY.md)                         | Product terms and their meanings                                  |
