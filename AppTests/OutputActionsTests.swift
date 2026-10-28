@@ -30,7 +30,7 @@ extension NativeAppTests.ItemListFocusTests {
             try await Task.sleep(for: .milliseconds(150))
             try NativeVisualEvidence.dumpAX(host, name: "filter-\(filter)")
             for expected in OutcomeFilter.allCases {
-                let button = try NativeVisualEvidence.required(host, id: "outcome-filter-\(expected)")
+                let button = try await NativeVisualEvidence.required(host, id: "outcome-filter-\(expected)")
                 let value = NativeVisualEvidence.attribute(button, "accessibilityValue") as? String ?? ""
                 #expect(expected == filter ? !value.isEmpty : value.isEmpty, "Exactly the selected filter must expose selection")
                 #expect(value == (expected == filter ? AccessibilityText.filterButtonValue(isOn: true) ?? "" : ""))
@@ -71,7 +71,7 @@ extension NativeAppTests.ItemListFocusTests {
             host.displayIfNeeded()
             let bitmap = try await NativeVisualEvidence.capture(host, name: "filter-\(filter)")
             #expect(host.fittingSize.width <= 560)
-            let selected = try NativeVisualEvidence.required(host, id: "outcome-filter-\(filter)")
+            let selected = try await NativeVisualEvidence.required(host, id: "outcome-filter-\(filter)")
             let rect = try NativeVisualEvidence.frame(selected, in: host)
             let image = try #require(bitmap.cgImage)
             let scale = CGFloat(image.width) / host.bounds.width
@@ -204,8 +204,14 @@ enum NativeVisualEvidence {
         }
     }
 
-    static func required(_ root: NSObject, id: String) throws -> NSObject {
-        let matches = elements(root).filter { attribute($0, "accessibilityIdentifier") as? String == id }
+    /// SwiftUI publishes its AX tree asynchronously after layout; slower CI runners need more than a fixed sleep.
+    static func required(_ root: NSObject, id: String, timeout: Duration = .seconds(3)) async throws -> NSObject {
+        let deadline = ContinuousClock.now + timeout
+        var matches = elements(root).filter { attribute($0, "accessibilityIdentifier") as? String == id }
+        while matches.isEmpty, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(50))
+            matches = elements(root).filter { attribute($0, "accessibilityIdentifier") as? String == id }
+        }
         #expect(matches.count == 1, "Required unique AX control: \(id)")
         return try #require(matches.first, "Missing AX control: \(id)")
     }

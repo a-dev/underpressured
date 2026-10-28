@@ -107,9 +107,9 @@ extension NativeAppTests {
         }
         visit(host, depth: 0)
         if name == "results" {
-            let destination = try NativeVisualEvidence.required(host, id: "destination-controls")
-            let folder = try NativeVisualEvidence.required(host, id: "export-folder")
-            let clear = try NativeVisualEvidence.required(host, id: "clear-history")
+            let destination = try await NativeVisualEvidence.required(host, id: "destination-controls")
+            let folder = try await NativeVisualEvidence.required(host, id: "export-folder")
+            let clear = try await NativeVisualEvidence.required(host, id: "clear-history")
             let destinationFrame = try NativeVisualEvidence.frame(destination, in: host)
             let folderFrame = try NativeVisualEvidence.frame(folder, in: host)
             let clearFrame = try NativeVisualEvidence.frame(clear, in: host)
