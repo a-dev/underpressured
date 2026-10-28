@@ -86,14 +86,15 @@ public final class UserDefaultsSettingsStore: SettingsStore {
 
     /// The bookmarked folder with access started, or nil to fall back to the saved path.
     /// Access is kept for the life of the process: Batches captured earlier may still write to a folder the user has since replaced.
+    /// A bookmark that grants no access, such as one the direct build saved before container migration, is rebuilt on the next save.
     private func resolveBookmark() -> URL? {
         guard let data = defaults.data(forKey: Key.exportFolderBookmark) else { return nil }
         var isStale = false
         guard let folder = try? URL(
             resolvingBookmarkData: data, options: .withSecurityScope, relativeTo: nil, bookmarkDataIsStale: &isStale)
         else { return nil }
-        _ = folder.startAccessingSecurityScopedResource()
-        bookmarkedFolder = isStale ? nil : folder
+        let accessing = folder.startAccessingSecurityScopedResource()
+        bookmarkedFolder = accessing && !isStale ? folder : nil
         return folder
     }
 

@@ -28,6 +28,8 @@ public final class ProcessingSession {
         case runStarted
         case activity(Activity)
         case scanFailures([ScanFailure])
+        /// The user granted the captured Export folder, so a saved bookmark can now include access.
+        case exportFolderGranted
         case queue(QueueEvent)
     }
 
@@ -69,6 +71,7 @@ public final class ProcessingSession {
     isolated deinit { eventTask?.cancel() }
 
     /// Captures settings after admission is unlocked and before scanning starts.
+    /// Before scanning, asks for an Export folder the app cannot write.
     /// Between scan and admission, asks for folders that converted loose files need.
     public func open(_ urls: [URL], capture: @MainActor () -> Capture?) async {
         let admissionGeneration = generation
@@ -91,6 +94,11 @@ public final class ProcessingSession {
             await previous?.value
             guard scanGeneration == generation, !Task.isCancelled else { return }
             let exportFolder: URL? = if case .exportFolder(let url) = captured.destination { url } else { nil }
+            if let exportFolder, !folderAccess.canCreateFiles(in: exportFolder) {
+                await folderAccess.requestAccess(to: exportFolder, for: .exportFolder)
+                guard scanGeneration == generation, !Task.isCancelled else { return }
+                if folderAccess.canCreateFiles(in: exportFolder) { onEvent?(.exportFolderGranted) }
+            }
             let intake = intake
             // The scanner blocks on filesystem calls, so it runs outside the cooperative pool.
             let result = await withCheckedContinuation { continuation in
@@ -103,7 +111,7 @@ public final class ProcessingSession {
                 for: result.items, outputFormat: captured.outputFormat, destination: captured.destination)
             // Checked per folder: granting one folder can cover the next.
             for folder in folders where !folderAccess.canCreateFiles(in: folder) {
-                await folderAccess.requestAccess(to: folder)
+                await folderAccess.requestAccess(to: folder, for: .siblingOutputs)
                 guard scanGeneration == generation, !Task.isCancelled else { return }
             }
             onEvent?(.scanFailures(result.failures))

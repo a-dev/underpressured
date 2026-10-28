@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "2700"
-   version = "1.7">
+   version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES"
@@ -18,6 +18,19 @@
                BlueprintIdentifier = "A10000000000000000000041"
                BuildableName = "Underpressured.app"
                BlueprintName = "Underpressured"
+               ReferencedContainer = "container:Underpressured.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A20000000000000000000041"
+               BuildableName = "UnderpressuredUpdaterFree.app"
                ReferencedContainer = "container:Underpressured.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -69,6 +82,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "A10000000000000000000041"
+            BuildableName = "Underpressured.app"
+            BlueprintName = "Underpressured"
+            ReferencedContainer = "container:Underpressured.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

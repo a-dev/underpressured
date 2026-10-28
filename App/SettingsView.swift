@@ -161,6 +161,9 @@ struct SupportSettingsView: View {
                         .buttonStyle(.link)
                         .focusable()
                 }
+                Button("Privacy Policy") { open(AppInfo.privacyPolicyURL) }
+                    .buttonStyle(.link)
+                    .focusable()
             }
         }
         .formStyle(.grouped)

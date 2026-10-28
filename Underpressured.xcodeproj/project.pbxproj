@@ -11,17 +11,18 @@
 		A10000000000000000000012 /* ImageEngine in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000092 /* ImageEngine */; };
 		A10000000000000000000013 /* LocalFileSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000093 /* LocalFileSystem */; };
 		A10000000000000000000014 /* AppModel in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000094 /* AppModel */; };
+		A10000000000000000000015 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000096 /* Sparkle */; };
+		A10000000000000000000016 /* Resources/Acknowledgements.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* Resources/Acknowledgements.txt */; };
 		A10000000000000000000017 /* UnderpressuredApplication in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000097 /* UnderpressuredApplication */; };
 		A10000000000000000000018 /* MacPlatform in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000098 /* MacPlatform */; };
 		A20000000000000000000011 /* UnderpressuredCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000091 /* UnderpressuredCore */; };
 		A20000000000000000000012 /* ImageEngine in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000092 /* ImageEngine */; };
 		A20000000000000000000013 /* LocalFileSystem in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000093 /* LocalFileSystem */; };
 		A20000000000000000000014 /* AppModel in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000094 /* AppModel */; };
+		A20000000000000000000016 /* Resources/Acknowledgements.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* Resources/Acknowledgements.txt */; };
 		A20000000000000000000017 /* UnderpressuredApplication in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000097 /* UnderpressuredApplication */; };
 		A20000000000000000000018 /* MacPlatform in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000098 /* MacPlatform */; };
-		A10000000000000000000015 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000096 /* Sparkle */; };
-		A10000000000000000000016 /* Acknowledgements.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* Acknowledgements.txt */; };
-		A20000000000000000000016 /* Acknowledgements.txt in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* Acknowledgements.txt */; };
+		A20000000000000000000019 /* Resources/container-migration.plist in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000025 /* Resources/container-migration.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,10 +36,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A10000000000000000000023 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Version.xcconfig; sourceTree = SOURCE_ROOT; };
-		A10000000000000000000024 /* Acknowledgements.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Resources/Acknowledgements.txt; sourceTree = SOURCE_ROOT; };
 		A10000000000000000000021 /* Underpressured.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Underpressured.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000022 /* UnderpressuredTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnderpressuredTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000023 /* Config/Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Version.xcconfig; sourceTree = SOURCE_ROOT; };
+		A10000000000000000000024 /* Resources/Acknowledgements.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Resources/Acknowledgements.txt; sourceTree = SOURCE_ROOT; };
+		A10000000000000000000025 /* Resources/container-migration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Resources/container-migration.plist"; sourceTree = SOURCE_ROOT; };
 		A20000000000000000000021 /* UnderpressuredUpdaterFree.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UnderpressuredUpdaterFree.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -54,21 +56,6 @@
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		A10000000000000000000065 /* Validate direct update configuration */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = ();
-			inputPaths = ("$(SRCROOT)/Info.plist", "$(SRCROOT)/scripts/validate-direct-update-config.py", );
-			name = "Validate direct update configuration";
-			outputPaths = ("$(DERIVED_FILE_DIR)/Direct-Info.plist", );
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "python3 \"$SRCROOT/scripts/validate-direct-update-config.py\" \"$DERIVED_FILE_DIR/Direct-Info.plist\" \"$SRCROOT/Info.plist\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A10000000000000000000051 /* Frameworks */ = {
@@ -111,8 +98,9 @@
 		A10000000000000000000002 = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000023 /* Version.xcconfig */,
-				A10000000000000000000024 /* Acknowledgements.txt */,
+				A10000000000000000000023 /* Config/Version.xcconfig */,
+				A10000000000000000000024 /* Resources/Acknowledgements.txt */,
+				A10000000000000000000025 /* Resources/container-migration.plist */,
 				A10000000000000000000031 /* App */,
 				A10000000000000000000032 /* AppTests */,
 				A10000000000000000000003 /* Products */,
@@ -238,18 +226,18 @@
 			knownRegions = (
 				en,
 				es,
-				pt-BR,
+				"pt-BR",
 				de,
 				fr,
 				ar,
 				ja,
-				zh-Hans,
+				"zh-Hans",
 				Base,
 			);
 			mainGroup = A10000000000000000000002;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				A10000000000000000000095 /* Sparkle */,
+				A10000000000000000000095 /* XCRemoteSwiftPackageReference "Sparkle" */,
 				A10000000000000000000090 /* XCLocalSwiftPackageReference "Packages/UnderpressuredKit" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -269,7 +257,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A10000000000000000000016 /* Acknowledgements.txt in Resources */,
+				A10000000000000000000016 /* Resources/Acknowledgements.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,11 +272,33 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A20000000000000000000016 /* Acknowledgements.txt in Resources */,
+				A20000000000000000000016 /* Resources/Acknowledgements.txt in Resources */,
+				A20000000000000000000019 /* Resources/container-migration.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A10000000000000000000065 /* Validate direct update configuration */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Info.plist",
+				"$(SRCROOT)/scripts/validate-direct-update-config.py",
+			);
+			name = "Validate direct update configuration";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Direct-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "python3 \"$SRCROOT/scripts/validate-direct-update-config.py\" \"$DERIVED_FILE_DIR/Direct-Info.plist\" \"$SRCROOT/Info.plist\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A10000000000000000000061 /* Sources */ = {
@@ -325,7 +335,7 @@
 /* Begin XCBuildConfiguration section */
 		A100000000000000000000A1 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A10000000000000000000023 /* Version.xcconfig */;
+			baseConfigurationReference = A10000000000000000000023 /* Config/Version.xcconfig */;
 			buildSettings = {
 				ARCHS = arm64;
 				CLANG_ENABLE_MODULES = YES;
@@ -340,16 +350,16 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
-				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Debug;
 		};
 		A100000000000000000000A2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A10000000000000000000023 /* Version.xcconfig */;
+			baseConfigurationReference = A10000000000000000000023 /* Config/Version.xcconfig */;
 			buildSettings = {
 				ARCHS = arm64;
 				CLANG_ENABLE_MODULES = YES;
@@ -361,25 +371,21 @@
 				MACOSX_DEPLOYMENT_TARGET = 27.0;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
-				SWIFT_EMIT_LOC_STRINGS = YES;
 			};
 			name = Release;
 		};
 		A100000000000000000000B1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "Config/Direct-Debug.entitlements";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CODE_SIGN_ENTITLEMENTS = "Config/Direct-Debug.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "$(DERIVED_FILE_DIR)/Direct-Info.plist";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
-				SPARKLE_FEED_URL = "";
-				SPARKLE_PUBLIC_ED_KEY = "";
-				SPARKLE_TEST_FEED = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = Underpressured;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -389,6 +395,10 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.underpressured.Underpressured;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SPARKLE_FEED_URL = "";
+				SPARKLE_PUBLIC_ED_KEY = "";
+				SPARKLE_TEST_FEED = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
 			};
 			name = Debug;
 		};
@@ -400,10 +410,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "$(DERIVED_FILE_DIR)/Direct-Info.plist";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
-				SPARKLE_FEED_URL = "https://a-dev.github.io/underpressured/appcast.xml";
-				SPARKLE_PUBLIC_ED_KEY = "NqMprqjIRcvw1MUhKIQJviJX+LLY6zB5vj7+yl2n7QU=";
-				SPARKLE_TEST_FEED = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = Underpressured;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -414,6 +420,10 @@
 				OTHER_CODE_SIGN_FLAGS = "--options=runtime";
 				PRODUCT_BUNDLE_IDENTIFIER = app.underpressured.Underpressured;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SPARKLE_FEED_URL = "https://a-dev.github.io/underpressured/appcast.xml";
+				SPARKLE_PUBLIC_ED_KEY = "NqMprqjIRcvw1MUhKIQJviJX+LLY6zB5vj7+yl2n7QU=";
+				SPARKLE_TEST_FEED = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
 			};
 			name = Release;
 		};
@@ -537,16 +547,23 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		A10000000000000000000095 /* Sparkle */ = {isa = XCRemoteSwiftPackageReference; repositoryURL = "https://github.com/sparkle-project/Sparkle"; requirement = {kind = exactVersion; version = 2.10.0; }; };
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCLocalSwiftPackageReference section */
 		A10000000000000000000090 /* XCLocalSwiftPackageReference "Packages/UnderpressuredKit" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Packages/UnderpressuredKit;
 		};
 /* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A10000000000000000000095 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.10.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		A10000000000000000000091 /* UnderpressuredCore */ = {
@@ -569,6 +586,11 @@
 			package = A10000000000000000000090 /* XCLocalSwiftPackageReference "Packages/UnderpressuredKit" */;
 			productName = AppModel;
 		};
+		A10000000000000000000096 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000000095 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
 		A10000000000000000000097 /* UnderpressuredApplication */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A10000000000000000000090 /* XCLocalSwiftPackageReference "Packages/UnderpressuredKit" */;
@@ -579,7 +601,6 @@
 			package = A10000000000000000000090 /* XCLocalSwiftPackageReference "Packages/UnderpressuredKit" */;
 			productName = MacPlatform;
 		};
-		A10000000000000000000096 /* Sparkle */ = {isa = XCSwiftPackageProductDependency; package = A10000000000000000000095 /* Sparkle */; productName = Sparkle; };
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A10000000000000000000001 /* Project object */;

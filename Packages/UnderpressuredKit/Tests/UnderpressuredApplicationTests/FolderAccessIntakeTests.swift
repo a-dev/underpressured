@@ -12,13 +12,15 @@ private final class RecordingFolderAccess: FolderAccess {
     var writable: Set<String> = []
     var grants = true
     var requests: [URL] = []
+    var purposes: [FolderAccessPurpose] = []
     var onRequest: (URL) async -> Void = { _ in }
     var log: [String] = []
 
     func canCreateFiles(in folder: URL) -> Bool { writable.contains(folder.path) }
 
-    func requestAccess(to folder: URL) async {
+    func requestAccess(to folder: URL, for purpose: FolderAccessPurpose) async {
         requests.append(folder)
+        purposes.append(purpose)
         log.append("request \(folder.path)")
         await onRequest(folder)
         if grants { writable.insert(folder.path) }
@@ -40,8 +42,12 @@ struct FolderAccessIntakeTests {
             intake: { urls, export, isActive in Scanner(files: files).scan(urls, exportFolder: export, isActive: isActive) },
             folderAccess: access)
         session.onEvent = { event in
-            if case .queue(.batchAdded(let batch)) = event {
+            switch event {
+            case .queue(.batchAdded(let batch)):
                 access.log.append("admitted \(batch.items.map(\.source.lastPathComponent).joined(separator: ","))")
+            case .exportFolderGranted:
+                access.log.append("granted")
+            default: break
             }
         }
         return session
@@ -67,6 +73,7 @@ struct FolderAccessIntakeTests {
         await open([URL(filePath: "/Photos/a.png")], access)
 
         #expect(access.log == ["request /Photos", "admitted a.png"])
+        #expect(access.purposes == [.siblingOutputs])
     }
 
     @Test func asksOncePerDistinctFolderInDropOrder() async {
@@ -109,14 +116,37 @@ struct FolderAccessIntakeTests {
         #expect(access.requests.isEmpty)
     }
 
-    @Test func noRequestForExportCopies() async {
+    @Test func noRequestForExportCopiesToAWritableFolder() async {
+        files.addFile(URL(filePath: "/Photos/a.png"), contentType: .png)
+        files.addDirectory(URL(filePath: "/Export"))
+        let access = RecordingFolderAccess()
+        access.writable = ["/Export"]
+
+        await open([URL(filePath: "/Photos/a.png")], access, destination: .exportFolder(URL(filePath: "/Export")))
+
+        #expect(access.requests.isEmpty)
+    }
+
+    @Test func asksForAnUnwritableExportFolderBeforeAdmissionAndReportsTheGrant() async {
         files.addFile(URL(filePath: "/Photos/a.png"), contentType: .png)
         files.addDirectory(URL(filePath: "/Export"))
         let access = RecordingFolderAccess()
 
         await open([URL(filePath: "/Photos/a.png")], access, destination: .exportFolder(URL(filePath: "/Export")))
 
-        #expect(access.requests.isEmpty)
+        #expect(access.log == ["request /Export", "granted", "admitted a.png"])
+        #expect(access.purposes == [.exportFolder])
+    }
+
+    @Test func refusedExportFolderStillAdmitsTheItemsWithoutAGrant() async {
+        files.addFile(URL(filePath: "/Photos/a.png"), contentType: .png)
+        files.addDirectory(URL(filePath: "/Export"))
+        let access = RecordingFolderAccess()
+        access.grants = false
+
+        await open([URL(filePath: "/Photos/a.png")], access, destination: .exportFolder(URL(filePath: "/Export")))
+
+        #expect(access.log == ["request /Export", "admitted a.png"])
     }
 
     @Test func noRequestForFilesInADroppedFolder() async {

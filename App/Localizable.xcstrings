@@ -2385,6 +2385,59 @@
         }
       }
     },
+    "Privacy Policy" : {
+      "comment" : "Help menu item and Settings link that open the privacy policy web page.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سياسة الخصوصية"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutzerklärung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Política de privacidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Politique de confidentialité"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーポリシー"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Política de Privacidade"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐私政策"
+          }
+        }
+      }
+    },
     "px" : {
       "comment" : "Abbreviation for pixels, shown next to a resize value.",
       "localizations" : {
@@ -3228,6 +3281,59 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "要将转换后的图像保存在原文件旁边，Underpressured 需要访问“%@”。"
+          }
+        }
+      }
+    },
+    "To save copies to your Export folder, Underpressured needs access to “%@” again." : {
+      "comment" : "Message in the folder panel shown when the remembered Export folder is no longer accessible, for example after moving from the direct download. Placeholder is a folder name.",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لحفظ النسخ في مجلد التصدير، يحتاج Underpressured إلى الوصول إلى «%@» مرة أخرى."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um Kopien in deinem Exportordner zu sichern, benötigt Underpressured erneut Zugriff auf „%@“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To save copies to your Export folder, Underpressured needs access to “%@” again."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para guardar copias en tu carpeta de exportación, Underpressured necesita acceder de nuevo a “%@”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour enregistrer des copies dans votre dossier d’exportation, Underpressured doit de nouveau accéder à « %@ »."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "書き出し先フォルダにコピーを保存するには、Underpressured が「%@」に再度アクセスする必要があります。"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para salvar cópias na sua pasta de exportação, o Underpressured precisa acessar “%@” novamente."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要将副本存储到导出文件夹，Underpressured 需要再次访问“%@”。"
           }
         }
       }

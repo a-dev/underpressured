@@ -238,4 +238,7 @@ Record the commit, macOS version, reviewer, date, and result. All checks remain 
 | Drop one file. Replace Originals with the original format. | No panel appears. |
 | Drop a folder. Replace Originals with a different output format. | No panel appears. Outputs appear beside their sources. |
 | Choose an Export folder, quit, relaunch, and process. | The remembered folder is used without a new prompt. |
-| Run a direct build with an Export folder, then the sandboxed build. | The sandboxed build reads its own container, so it starts with initial settings. Container migration is not designed yet. |
+| Delete `~/Library/Containers/app.underpressured.Underpressured`. Run a direct build. Add a preset, choose an Export folder, and turn Trash off. Quit. Launch the sandboxed build. | `container-migration.plist` moves `~/Library/Preferences/app.underpressured.Underpressured.plist` into the container. The sandboxed build shows the presets, active preset, Destination, Trash setting, and Export folder name. The direct build then starts with initial settings. |
+| After that migration, select Replace Originals, then select the Export folder entry. | The folder picker opens, because the migrated folder is not writable in the sandbox. After a choice, relaunch keeps the folder without a prompt. |
+| After that migration, with the Export folder still selected, drop one file. Click Grant Access. | A folder panel opens at the Export folder before scanning. The copy appears in the folder. After a relaunch, the next drop shows no panel. |
+| After that migration, with the Export folder still selected, drop one file. Cancel the panel. | The item fails with "No permission". The next drop shows the panel again. |

@@ -132,6 +132,27 @@ import UnderpressuredCore
         #expect(model.rows.first?.stateText == "Failed")
     }
 
+    @Test func grantedExportFolderAccessSavesTheSettingsAgain() async {
+        let folder = URL(filePath: "/tmp/underpressured-export")
+        let remembered = DestinationSettings(kind: .exportFolder, exportFolder: folder, moveToTrash: false)
+        let store = InMemorySettingsStore(AppSettings(presets: .starter, destination: remembered))
+        let access = GrantingFolderAccess()
+        let model = AppModel(
+            queue: Queue(parallelism: 1) { item, _, _, _ in
+                .optimized(Savings(originalBytes: 10, newBytes: 5), notes: [], output: item.source)
+            },
+            intake: { urls, _, _ in ScanResult(items: urls.map { Item(source: $0, droppedRoot: nil) }) },
+            settingsStore: store, folderAccess: access)
+        let loaded = store.saveCount
+
+        await model.open([URL(filePath: "/tmp/granted-destination.jpg")])
+        await model.untilIdle()
+
+        #expect(access.requested == [folder])
+        #expect(store.saveCount == loaded + 1)
+        #expect(store.saved?.destination == remembered)
+    }
+
     @Test func badgeKeepsItsNameWhileEditing() {
         let model = makeModel()
         let preset = model.presets.active
@@ -153,4 +174,12 @@ import UnderpressuredCore
         #expect(model.outputFormat == .jpeg)
     }
 
+}
+
+/// Not writable until asked; every request is granted.
+@MainActor
+private final class GrantingFolderAccess: FolderAccess {
+    private(set) var requested: [URL] = []
+    func canCreateFiles(in folder: URL) -> Bool { requested.contains(folder) }
+    func requestAccess(to folder: URL, for purpose: FolderAccessPurpose) async { requested.append(folder) }
 }

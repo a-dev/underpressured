@@ -6,7 +6,7 @@ Underpressured compresses, resizes, and converts still images in batches. All pr
 
 ## 2. Platform
 
-The app targets Apple Silicon and macOS 27 or later. The direct-distribution app is not sandboxed. The updater-free app runs in the App Sandbox. See [Release](release.md) for signing and distribution.
+The app targets Apple Silicon and macOS 27 or later. The direct-distribution app is not sandboxed. The updater-free app runs in the App Sandbox. On its first launch, before its container exists, macOS moves the direct-distribution app's settings into the container. The direct-distribution app then starts with initial settings. See [Release](release.md) for signing and distribution.
 
 ## 3. Main window
 
@@ -107,6 +107,8 @@ Move original to Trash appears beside replacement controls only in replacement m
 Replace originals writes a same-format result atomically at the source path. Conversion writes a sibling file before removing the source.
 
 A sandboxed app can have access to a dropped file but not to its folder, and a conversion must create a new file there. After scanning and before admission, intake finds the folders of loose files that it will convert. For each folder where the app cannot create files, a folder panel opens at that folder with a Grant Access button. One panel appears for each folder, in intake order. Files inside dropped folders, Export Copies, same-format results, and the direct-distribution app never show the panel. If the user cancels the panel, the items are still admitted, and their conversions fail with No permission. Cancel while the panel is open discards that intake when the panel closes.
+
+Export Copies can capture a remembered Export folder that the sandboxed app cannot write, such as one moved from the direct-distribution app. Before scanning, intake opens a folder panel at that folder with a Grant Access button. After a grant, the app saves the folder again, so later launches reopen it without a panel. If the user cancels, the items are still admitted, and their exports fail with No permission. A missing Export folder shows no panel and fails with Export folder unavailable.
 
 Move originals to Trash sends replaced sources to the Trash. A volume without Trash produces a failure. Skipped sources remain untouched.
 

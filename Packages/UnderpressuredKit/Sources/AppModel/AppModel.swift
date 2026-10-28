@@ -173,6 +173,8 @@ public final class AppModel {
                 for failure in failures where known.insert(failure).inserted {
                     self.intakeFailures.append(failure)
                 }
+            case .exportFolderGranted:
+                self.settingsChanged()
             case .activity(let activity):
                 // Completion must see all terminal queue events, regardless of the UI throttle.
                 if !activity.isRunning { self.applyPending() }
