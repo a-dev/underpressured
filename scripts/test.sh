@@ -2,7 +2,15 @@
 # Runs the full Underpressured test suite: native deps, the UnderpressuredKit package tests,
 # then the app's xcodebuild tests. This is the single command CI and developers run.
 # Pipes through xcbeautify when it is installed; otherwise prints raw xcodebuild output.
+# --fast stops after the package tests: no app build, catalog audit or release signature.
 set -euo pipefail
+
+FAST=0
+case "${1:-}" in
+  --fast) FAST=1 ;;
+  "") ;;
+  *) printf 'usage: %s [--fast]\n' "$0" >&2; exit 2 ;;
+esac
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
@@ -43,6 +51,7 @@ run direct-update-config python3 scripts/test_validate_direct_update_config.py
 run update-fixture-server python3 scripts/test_update_fixture_server.py
 run release-fixtures python3 scripts/test_release.py
 run publication-fixtures python3 scripts/test_publish_release.py
+run github-publication-fixtures python3 scripts/test_publish_github.py
 run rust cargo test --manifest-path rust/up-codecs/Cargo.toml
 run build-deps scripts/build-deps.sh
 
@@ -50,6 +59,10 @@ run build-deps scripts/build-deps.sh
 # from satisfying the actual-catalog audit.
 run swift-package swift test --package-path Packages/UnderpressuredKit \
   --scratch-path "$RUN_ROOT/package"
+if [ "$FAST" = 1 ]; then
+  step "fast tests passed (results: $RUN_ROOT/results.tsv)"
+  exit 0
+fi
 export UP_UI_ARTIFACTS="$RUN_ROOT/native-ui"
 export TEST_RUNNER_UP_UI_ARTIFACTS="$UP_UI_ARTIFACTS"
 run native-app xcodebuild test \

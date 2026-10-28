@@ -401,8 +401,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "$(DERIVED_FILE_DIR)/Direct-Info.plist";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DIRECT_DISTRIBUTION";
-				SPARKLE_FEED_URL = "";
-				SPARKLE_PUBLIC_ED_KEY = "";
+				SPARKLE_FEED_URL = "https://a-dev.github.io/underpressured/appcast.xml";
+				SPARKLE_PUBLIC_ED_KEY = "NqMprqjIRcvw1MUhKIQJviJX+LLY6zB5vj7+yl2n7QU=";
 				SPARKLE_TEST_FEED = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = Underpressured;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.graphics-design";

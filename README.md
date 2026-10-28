@@ -2,7 +2,7 @@
 
 Underpressured is a macOS app for compressing, resizing, and converting images in batches. Drop files or folders, choose a preset, and replace the originals or export copies.
 
-Image processing happens on your Mac. The app has no analytics. Optional update checks and downloads contact the configured release hosts: automatic checks are offered only after you consent, and **Check for Updates…** starts a manual check. No public release host is configured yet, so update availability depends on a release being published. Updates are never installed silently. You choose whether to install; if processing is active, installation and restart wait until the queue is idle, including after cancellation. See [Release](docs/release.md#first-update-enabled-release) for how to install the first update-enabled release.
+Image processing happens on your Mac. The app has no analytics. Optional update checks and downloads contact the configured release hosts: automatic checks are offered only after you consent, and **Check for Updates…** starts a manual check. Update checks read the feed on GitHub Pages (`a-dev.github.io`) and download from GitHub Releases. Updates are never installed silently. You choose whether to install; if processing is active, installation and restart wait until the queue is idle, including after cancellation. See [Release](docs/release.md#first-update-enabled-release) for how to install the first update-enabled release.
 
 The app requires Apple Silicon and macOS 27 or later. To build from source, use Xcode 27, CMake, Ninja, and Rust.
 

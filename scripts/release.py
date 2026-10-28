@@ -23,6 +23,9 @@ import xml.etree.ElementTree as ET
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
+FEED_URL = 'https://a-dev.github.io/underpressured/appcast.xml'
+PUBLIC_KEY = 'NqMprqjIRcvw1MUhKIQJviJX+LLY6zB5vj7+yl2n7QU='
+DOWNLOAD_URL_ROOT = 'https://github.com/a-dev/underpressured/releases/download'
 SPARKLE = 'http://www.andymatuschak.org/xml-namespaces/sparkle'
 _CONFIG_SPEC = importlib.util.spec_from_file_location('direct_update_config', ROOT / 'scripts/validate-direct-update-config.py')
 _UPDATE_CONFIG = importlib.util.module_from_spec(_CONFIG_SPEC)
@@ -242,12 +245,16 @@ def main():
     for name in ('history', 'notes', 'output', 'key-file'):
         p.add_argument('--' + name, type=Path, required=True)
     p.add_argument('--sparkle-bin', type=Path, default=ROOT / 'DerivedData/SourcePackages/artifacts/sparkle/Sparkle/bin')
-    for name in ('feed-url', 'download-url-prefix', 'public-key', 'identity', 'team', 'notary-profile'):
+    p.add_argument('--feed-url', default=FEED_URL)
+    p.add_argument('--public-key', default=PUBLIC_KEY)
+    p.add_argument('--download-url-prefix', help=f'default: {DOWNLOAD_URL_ROOT}/<VERSION>-<BUILD>')
+    for name in ('identity', 'team', 'notary-profile'):
         p.add_argument('--' + name, required=True)
     p.add_argument('--acknowledgements-reviewed', action='store_true')
     a = p.parse_args()
     try:
         version, build = versions(ROOT / 'Config/Version.xcconfig')
+        a.download_url_prefix = a.download_url_prefix or f'{DOWNLOAD_URL_ROOT}/{version}-{build}'
         prerequisites(a, build)
         plan = commands(a, version, build)
         if a.dry_run:
