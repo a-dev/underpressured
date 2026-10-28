@@ -27,9 +27,17 @@ import UnderpressuredCore
     }
 
     @Test func percentFormattingRespectsSignAndRounding() {
-        #expect(Presentation.percentText(Savings(originalBytes: 1000, newBytes: 500)) == "-50%")
-        #expect(Presentation.percentText(Savings(originalBytes: 1000, newBytes: 1180)) == "+18%")
-        #expect(Presentation.percentText(Savings(originalBytes: 1000, newBytes: 1001)) == "0%")
+        let us = Locale(identifier: "en_US")
+        #expect(Presentation.percentText(Savings(originalBytes: 1000, newBytes: 500), locale: us) == "-50%")
+        #expect(Presentation.percentText(Savings(originalBytes: 1000, newBytes: 1180), locale: us) == "+18%")
+        #expect(Presentation.percentText(Savings(originalBytes: 1000, newBytes: 1001), locale: us) == "0%")
+    }
+
+    @Test func percentFormattingFollowsTheRegion() {
+        let turkey = Locale(identifier: "en_TR")
+        #expect(Presentation.percentText(Savings(originalBytes: 1000, newBytes: 500), locale: turkey) == "-%50")
+        #expect(Presentation.percentText(Savings(originalBytes: 1000, newBytes: 1180), locale: turkey) == "+%18")
+        #expect(Presentation.percent(62, locale: turkey) == "%62")
     }
 }
 

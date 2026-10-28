@@ -195,13 +195,18 @@ public enum Presentation {
         ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
     }
 
-    /// "−62%" saved, "+18%" growth, "0%" when it rounds to nothing.
-    public static func percentText(_ savings: Savings) -> String {
+    /// "−62%" saved, "+18%" growth, "0%" when it rounds to nothing, in the region's percent style.
+    public static func percentText(_ savings: Savings, locale: Locale = .current) -> String {
         let percent = roundedPercent(savings)
-        let value = Double(percent) / 100
-        if percent == 0 { return value.formatted(.percent.precision(.fractionLength(0))) }
-        let signed = savings.bytes < 0 ? value : -value
-        return signed.formatted(.percent.precision(.fractionLength(0)).sign(strategy: .always()))
+        if percent == 0 { return self.percent(0, locale: locale) }
+        return self.percent(savings.bytes < 0 ? percent : -percent, signed: true, locale: locale)
+    }
+
+    /// A whole percentage in the region's style, such as "62%", or "%62" in Turkey.
+    static func percent(_ whole: Int, signed: Bool = false, locale: Locale = .current) -> String {
+        let style = FloatingPointFormatStyle<Double>.Percent(locale: locale).precision(.fractionLength(0))
+        let value = Double(whole) / 100
+        return signed ? value.formatted(style.sign(strategy: .always())) : value.formatted(style)
     }
 
     static func roundedPercent(_ savings: Savings) -> Int {
