@@ -1,0 +1,2 @@
+repeated_cycles	items_per_cycle	active_records_after_last_cycle	batches_after_last_cycle	waiting_slots_after_last_cycle	pixel_waiter_slots_after_last_cycle	active_sources_after_last_cycle	has_run_after_last_cycle
+100	100	0	0	0	0	0	false

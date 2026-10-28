@@ -1,0 +1,17 @@
+[package]
+name = "quantizr-cli"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Bench-only CLI around the quantizr crate (MIT-style license; see crate)"
+
+[[bin]]
+name = "quantizr-cli"
+path = "src/main.rs"
+
+[dependencies]
+quantizr = "=1.4.3"
+png = "=0.18.1"
+
+[profile.release]
+opt-level = 3

@@ -1,0 +1,31 @@
+# Swift Package Manager / Xcode build output (any depth)
+.build/
+DerivedData/
+build/
+.swiftpm/
+
+# Vendored third-party sources and dependencies
+Vendor/
+
+# Rust build output (per crate / workspace)
+rust/**/target/
+
+# Benchmark outputs and downloaded tools (bench/.gitignore also covers these)
+bench/corpus/
+bench/out/
+bench/.tools/
+
+# Xcode user state. The shared .xcodeproj itself stays tracked.
+xcuserdata/
+*.xcuserstate
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# macOS Finder metadata
+.DS_Store
+
+# Python release/fixture test imports
+scripts/__pycache__/
+
+# Temporary files and caches
+tmp/
+.audit/

@@ -1,0 +1,86 @@
+name: CI
+
+# Always use an ephemeral hosted arm64 runner, including for fork PRs.
+# Never route untrusted PR code through the persistent CI_RUNNER fallback.
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: xcode-27
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Select Xcode 27
+        run: |
+          set -euo pipefail
+          xcode="$(find /Applications -maxdepth 1 -name 'Xcode_27*.app' | sort -V | tail -n 1)"
+          if [ -z "$xcode" ]; then
+            echo "::error::Xcode 27 is not installed on this runner image (no /Applications/Xcode_27*.app). Check the hosted xcode-27 image inventory; do not route fork PRs to a persistent runner."
+            exit 1
+          fi
+          echo "Selecting $xcode"
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+
+      - name: Toolchain (Rust, cmake, ninja)
+        run: |
+          set -euo pipefail
+          if command -v rustup >/dev/null 2>&1; then
+            rustup target add aarch64-apple-darwin
+          fi
+          cargo --version
+          command -v cmake >/dev/null 2>&1 || brew install cmake
+          command -v ninja >/dev/null 2>&1 || brew install ninja
+          cmake --version
+          ninja --version
+
+      - name: Compute vendor cache key
+        id: vendor-hash
+        run: echo "hash=$(scripts/build-deps.sh --print-hash)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Vendor/
+        uses: actions/cache@v4
+        with:
+          # Only the outputs and the stamp; Vendor/.build (jpegli sources and build tree, ~0.5 GB) is not needed.
+          path: |
+            Vendor/*.xcframework
+            Vendor/.stamp
+          key: vendor-${{ runner.os }}-${{ runner.arch }}-${{ steps.vendor-hash.outputs.hash }}
+
+      - name: Test
+        env:
+          UP_TEST_ARTIFACTS: ${{ runner.temp }}/test-gate
+        run: scripts/test.sh
+
+      # Run on every gate, so UI/localization PRs and release tags both retain evidence.
+      - name: Seven-language native UI companion
+        env:
+          UP_UI_ARTIFACTS: ${{ runner.temp }}/localized-ui
+        run: scripts/check-localized-ui.sh
+
+      - name: Upload test and localization review artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-and-localization-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/test-gate/**/results.tsv
+            ${{ runner.temp }}/test-gate/**/*.log
+            ${{ runner.temp }}/test-gate/**/Logs/Test/**
+            ${{ runner.temp }}/test-gate/**/native-ui/**
+            ${{ runner.temp }}/localized-ui
+          if-no-files-found: warn
