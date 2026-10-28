@@ -2,17 +2,16 @@
 
 This guide is for the release operator. Keep all signing credentials and keys out of the repository.
 
-The project has no published release or configured production host, signing identity, or update key.
+Updates are hosted on GitHub. The feed is `https://a-dev.github.io/underpressured/appcast.xml`, served by GitHub Pages from the `gh-pages` branch. Each version's ZIP and DMG are assets of the GitHub Release tagged `<VERSION>-<BUILD>`. The public EdDSA key is `NqMprqjIRcvw1MUhKIQJviJX+LLY6zB5vj7+yl2n7QU=`. The Release build settings and `scripts/release.py` use these values by default.
 
 ## Steps
 
 1. Set the version and build in [Config/Version.xcconfig](../Config/Version.xcconfig). The build is a positive integer. It must be greater than every published build, also withdrawn ones. Never use a build number again.
 2. Make a release candidate with `scripts/release.sh`. Do the dry run first.
-3. Publish the candidate with `scripts/publish-release.py`. Do the plan first.
-4. Make a draft GitHub Release and attach the DMG.
-5. Add an arm64-only Homebrew cask to the personal tap: version, SHA-256, DMG URL, macOS 27 minimum, and uninstall paths. Run `brew audit --cask --strict`.
-6. Do the release-build checks in [Release build checks](#release-build-checks).
-7. Add the DMG and Homebrew install commands to the root README.
+3. Publish the candidate with `scripts/publish-github.py`. Do the plan first.
+4. Add an arm64-only Homebrew cask to the personal tap: version, SHA-256, DMG URL, macOS 27 minimum, and uninstall paths. Run `brew audit --cask --strict`.
+5. Do the release-build checks in [Release build checks](#release-build-checks).
+6. Add the DMG and Homebrew install commands to the root README.
 
 ## Make a release candidate
 
@@ -20,7 +19,6 @@ Prepare these local inputs:
 
 - A history file with all published builds, for example `{"published_builds": [1, 2]}`. For the first release, use `{"published_builds": []}`. The script checks the file format. It does not check that the list is complete.
 - HTML release notes.
-- The HTTPS feed URL, a download URL prefix for this version and build, and the public EdDSA key.
 - The private key file, outside the checkout, with mode `0600` or stricter.
 
 Run the dry run:
@@ -31,12 +29,11 @@ scripts/release.sh --dry-run \
   --notes /private/tmp/release-notes.html \
   --output /private/tmp/underpressured-candidate \
   --key-file /secure/external/underpressured-ed25519.key \
-  --feed-url https://HOST/appcast.xml \
-  --download-url-prefix https://HOST/releases/0.1.0-1/ \
-  --public-key PUBLIC_BASE64_KEY \
   --identity 'Developer ID Application: NAME (TEAMID)' \
   --team TEAMID0000 --notary-profile underpressured-release
 ```
+
+`--feed-url`, `--public-key` and `--download-url-prefix` default to the GitHub hosting values. The default download prefix is `https://github.com/a-dev/underpressured/releases/download/<VERSION>-<BUILD>`.
 
 The dry run reads the inputs and prints the commands. It does not run them, use Keychain, connect to a server, or write output.
 
@@ -65,38 +62,31 @@ Local tests: `python3 scripts/test_release.py` with mocks and `python3 scripts/t
 
 ## Publish
 
-`scripts/publish-release.py` uses a candidate directory. It does not build, sign, or change the candidate files. Without `--publish`, it only prints a plan and makes no network requests.
+Do this one-time setup before the first release:
 
-Make a JSON config. Test and production must use different feeds, services, and asset locations. All URLs use HTTPS. The download prefix ends in `/<VERSION>-<BUILD>`.
+1. Create an empty `gh-pages` branch and push it.
+2. In the repository settings, set Pages to deploy from `gh-pages`, root folder.
+3. Sign in with `gh auth login`, using an account that can create releases and push to `gh-pages`.
 
-```json
-{
-  "channel": "test",
-  "feed_url": "https://HOST/test/appcast.xml",
-  "download_url_prefix": "https://HOST/test/releases/0.1.0-1",
-  "service_url": "https://SERVICE/test",
-  "production_feed_url": "https://HOST/appcast.xml",
-  "production_download_url_prefix": "https://HOST/releases/0.1.0-1",
-  "production_service_url": "https://SERVICE/production"
-}
-```
+Plan the publish. The plan makes no network requests:
 
 ```sh
-python3 scripts/publish-release.py --candidate /private/tmp/underpressured-candidate \
-  --config /secure/external/publish-test.json
+scripts/publish-github.py --candidate /private/tmp/underpressured-candidate --notes /private/tmp/release-notes.md
 ```
 
-Read the plan. To publish, add `--publish`. If the service needs a token, set `UNDERPRESSURED_PUBLISH_TOKEN`. The script sends the token only to the service.
+To publish, add `--publish`. The script does these steps in this order. It changes the feed last, so a failure keeps the old feed:
 
-The publisher does the steps in this order. It changes the feed last, so a failure keeps the old feed:
+1. Checks the candidate bytes against `SHA256.json`, and checks that the URLs are the GitHub hosting URLs.
+2. Reads the live feed. It refuses a build that is not greater than the live one.
+3. Creates the GitHub Release `<VERSION>-<BUILD>` with the ZIP, DMG and `SHA256.json`.
+4. Downloads the assets without credentials and compares the bytes.
+5. Replaces `appcast.xml` on `gh-pages`. The update fails if the file changed after step 2.
 
-1. Reserve the build.
-2. Upload the assets.
-3. Make the assets public.
-4. Download the assets without credentials and compare the bytes.
-5. Replace the feed.
+If step 3 or 4 fails, delete the incomplete release and its tag, then run again. If the candidate must change, make a new candidate with a higher build. Pages can take a few minutes to serve the new feed.
 
-If a run fails, read the service state and run again with the same identity. The publisher continues from the last good step. If the candidate must change, make a new candidate with a higher build. Never use a reserved build again.
+To withdraw a release, put the previous `appcast.xml` back on `gh-pages`. Never use its build again.
+
+`scripts/publish-release.py` and `scripts/publication-store.py` remain as the adapter for a self-hosted service. GitHub publishing does not use them.
 
 ### Service contract
 

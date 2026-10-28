@@ -43,6 +43,7 @@ run direct-update-config python3 scripts/test_validate_direct_update_config.py
 run update-fixture-server python3 scripts/test_update_fixture_server.py
 run release-fixtures python3 scripts/test_release.py
 run publication-fixtures python3 scripts/test_publish_release.py
+run github-publication-fixtures python3 scripts/test_publish_github.py
 run rust cargo test --manifest-path rust/up-codecs/Cargo.toml
 run build-deps scripts/build-deps.sh
 
