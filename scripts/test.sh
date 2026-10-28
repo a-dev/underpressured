@@ -65,11 +65,26 @@ if [ "$FAST" = 1 ]; then
 fi
 export UP_UI_ARTIFACTS="$RUN_ROOT/native-ui"
 export TEST_RUNNER_UP_UI_ARTIFACTS="$UP_UI_ARTIFACTS"
+# TEMPORARY: CI sets UP_SKIP_CI_UNSTABLE_UI_TESTS=1 to skip these tests. Remove this skip when we find a fix.
+# Local runs do not set the variable, so they run all tests.
+# The first three tests read the SwiftUI AX tree. The hosted runner gives an empty tree.
+# These tests pass locally on Xcode 27.1 and 27.2.
+# The checkmark pixel baseline is valid only for Xcode 27.1, build 27A9275. See AppTests/Fixtures/README.md.
+skip_testing=()
+if [ "${UP_SKIP_CI_UNSTABLE_UI_TESTS:-0}" = 1 ]; then
+  skip_testing=(
+    -skip-testing:UnderpressuredTests/NativeAppTests/ItemListFocusTests/selectedFilterAccessibilityAndAction\(\)
+    -skip-testing:UnderpressuredTests/NativeAppTests/LocalizationLayoutTests/localizedSurfacesAtMinimumSize\(\)
+    -skip-testing:UnderpressuredTests/NativeAppTests/ConstrainedLayoutTests/longDestinationAndClearRemainVisibleAndOperable\(\)
+    -skip-testing:UnderpressuredTests/NativeAppTests/ItemListFocusTests/selectedFilterMatchesReviewedCheckmark\(\)
+  )
+fi
 run native-app xcodebuild test \
   -project Underpressured.xcodeproj \
   -scheme Underpressured \
   -destination 'platform=macOS,arch=arm64' \
   -derivedDataPath "$RUN_ROOT/app" \
+  ${skip_testing[@]+"${skip_testing[@]}"} \
   | pretty
 run localization-catalogs python3 scripts/check-localization.py \
   --package-build "$RUN_ROOT/package" \
