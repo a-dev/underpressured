@@ -43,7 +43,7 @@
 		A10000000000000000000024 /* Resources/Acknowledgements.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Resources/Acknowledgements.txt; sourceTree = SOURCE_ROOT; };
 		A10000000000000000000025 /* Resources/container-migration.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Resources/container-migration.plist"; sourceTree = SOURCE_ROOT; };
 		A10000000000000000000026 /* Resources/PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Resources/PrivacyInfo.xcprivacy; sourceTree = SOURCE_ROOT; };
-		A20000000000000000000021 /* UnderpressuredUpdaterFree.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UnderpressuredUpdaterFree.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000021 /* Underpressured.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Underpressured.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -115,7 +115,7 @@
 			children = (
 				A10000000000000000000021 /* Underpressured.app */,
 				A10000000000000000000022 /* UnderpressuredTests.xctest */,
-				A20000000000000000000021 /* UnderpressuredUpdaterFree.app */,
+				A20000000000000000000021 /* Underpressured.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -201,7 +201,7 @@
 				A10000000000000000000098 /* MacPlatform */,
 			);
 			productName = UnderpressuredUpdaterFree;
-			productReference = A20000000000000000000021 /* UnderpressuredUpdaterFree.app */;
+			productReference = A20000000000000000000021 /* Underpressured.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -483,7 +483,8 @@
 					"@executable_path/../Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.underpressured.Underpressured;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = UnderpressuredUpdaterFree;
+				PRODUCT_NAME = Underpressured;
 			};
 			name = Debug;
 		};
@@ -508,7 +509,8 @@
 				);
 				OTHER_CODE_SIGN_FLAGS = "--options=runtime";
 				PRODUCT_BUNDLE_IDENTIFIER = app.underpressured.Underpressured;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = UnderpressuredUpdaterFree;
+				PRODUCT_NAME = Underpressured;
 			};
 			name = Release;
 		};

@@ -75,15 +75,15 @@ jobs:
       - name: Test
         env:
           UP_TEST_ARTIFACTS: ${{ runner.temp }}/test-gate
-          # TEMPORARY: Skip the native UI tests that fail on the hosted runner. Remove this line when we find a fix. See scripts/test.sh.
+          # TEMPORARY: Skip the native UI tests that failed on the hosted runner. The AX tree fix is not yet verified in CI. See scripts/test.sh.
           UP_SKIP_CI_UNSTABLE_UI_TESTS: '1'
         # In Actions expressions, '' is false. So `cond && '' || x` always gives x.
         run: scripts/test.sh ${{ steps.gate.outputs.full != 'true' && '--fast' || '' }}
 
       # Runs on every full gate, so release tags and `full-ci` PRs retain UI and localization evidence.
-      # TEMPORARY: This step is off. Turn it on again when we find a fix.
-      # LocalizationLayoutTests reads the SwiftUI AX tree. The hosted runner gives an empty tree.
-      # The test passes locally on Xcode 27.1 and 27.2. Until the fix, run scripts/check-localized-ui.sh locally.
+      # TEMPORARY: This step is off. Turn it on again after a full CI run proves the AX tree fix. See scripts/test.sh.
+      # LocalizationLayoutTests reads the SwiftUI AX tree. The hosted runner gave an empty tree.
+      # Until then, run scripts/check-localized-ui.sh locally.
       - name: Seven-language native UI companion
         if: false && steps.gate.outputs.full == 'true'
         env:

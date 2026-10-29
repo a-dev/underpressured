@@ -20,6 +20,8 @@ Run the `Underpressured` scheme. The first dependency build downloads the pinned
 
 The two targets use the same app sources and package products.
 
+Both targets build `Underpressured.app` with the bundle name `Underpressured`. The updater-free target keeps the Swift module name `UnderpressuredUpdaterFree`. Because the products have the same name, build each scheme with its own `-derivedDataPath`. The `Underpressured` scheme does not build the updater-free target.
+
 ### Updater-free target
 
 - `Config/UpdaterFree.entitlements` enables the App Sandbox, read-write access to files that the user selects, and app-scoped bookmarks.
@@ -70,6 +72,7 @@ It runs, in sequence:
 4. Native dependency builds.
 5. Swift package tests and app tests.
 6. Checks of the compiler-extracted localization catalogs and the release signatures against the build from this run.
+7. A build of the `UnderpressuredUpdaterFree` scheme in its own folder, and `inspect-update-bundle.py updater-free` on that app.
 
 The first failure stops the script with a failing exit status.
 
@@ -127,7 +130,9 @@ To check both policies, use one APFS image and one case-sensitive APFS image. Af
 
 ### Native UI and localization
 
-Native tests need Xcode 27 and a logged-in macOS GUI session. They check accessibility identifiers, selection, focus, geometry, and actions. Only the reviewed checkmark crop uses a pixel comparison. [AppTests/Fixtures/README.md](../AppTests/Fixtures/README.md) has its environment and review policy.
+Native tests need Xcode 27 and a logged-in macOS GUI session. They check accessibility identifiers, selection, focus, geometry, and actions. Only the reviewed checkmark crop uses a pixel comparison.
+
+The tests read the SwiftUI accessibility tree in the test process. They do not need Accessibility permission in System Settings. SwiftUI builds the full tree only when an assistive client, such as VoiceOver, sets `AXEnhancedUserInterface` on the app. Without one, `NSHostingView` exposes almost no children. `NativeVisualEvidence` sets that attribute before it reads the tree. Do not remove it. [AppTests/Fixtures/README.md](../AppTests/Fixtures/README.md) has its environment and review policy.
 
 ```sh
 xcodebuild test -project Underpressured.xcodeproj -scheme Underpressured \

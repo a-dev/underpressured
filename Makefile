@@ -6,8 +6,8 @@
 # Keep generated files in the git-ignored build/ directory.
 # Override with: make build:sparkless BUILD_DIR=/absolute/path/to/output
 BUILD_DIR ?= $(CURDIR)/build/sparkless
-APP_PATH = $(BUILD_DIR)/Build/Products/Release/UnderpressuredUpdaterFree.app
-ZIP_PATH = $(BUILD_DIR)/UnderpressuredUpdaterFree.zip
+APP_PATH = $(BUILD_DIR)/Build/Products/Release/Underpressured.app
+ZIP_PATH = $(BUILD_DIR)/Underpressured.zip
 
 .PHONY: help deps build\:sparkless zip\:sparkless
 

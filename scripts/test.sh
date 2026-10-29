@@ -65,10 +65,11 @@ if [ "$FAST" = 1 ]; then
 fi
 export UP_UI_ARTIFACTS="$RUN_ROOT/native-ui"
 export TEST_RUNNER_UP_UI_ARTIFACTS="$UP_UI_ARTIFACTS"
-# TEMPORARY: CI sets UP_SKIP_CI_UNSTABLE_UI_TESTS=1 to skip these tests. Remove this skip when we find a fix.
+# TEMPORARY: CI sets UP_SKIP_CI_UNSTABLE_UI_TESTS=1 to skip these tests.
 # Local runs do not set the variable, so they run all tests.
-# The first three tests read the SwiftUI AX tree. The hosted runner gives an empty tree.
-# These tests pass locally on Xcode 27.1 and 27.2.
+# The first three tests read the SwiftUI AX tree. SwiftUI builds that tree only when an assistive client is active.
+# NativeVisualEvidence now sets AXEnhancedUserInterface to activate it, which fixes the local failure.
+# The same cause probably explains the empty tree on the hosted runner. Remove these three skips after a full CI run passes without them.
 # The checkmark pixel baseline is valid only for Xcode 27.1, build 27A9275. See AppTests/Fixtures/README.md.
 skip_testing=()
 if [ "${UP_SKIP_CI_UNSTABLE_UI_TESTS:-0}" = 1 ]; then
@@ -93,5 +94,15 @@ run release-signature env \
   UP_RELEASE_TEST_APP="$RUN_ROOT/app/Build/Products/Debug/Underpressured.app" \
   UP_RELEASE_TEST_SPARKLE_BIN="$RUN_ROOT/app/SourcePackages/artifacts/sparkle/Sparkle/bin" \
   python3 scripts/test_release_crypto.py
+
+# The App Store target shares the product name with the direct target, so it builds in its own folder.
+run app-store-build xcodebuild build \
+  -project Underpressured.xcodeproj \
+  -scheme UnderpressuredUpdaterFree \
+  -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath "$RUN_ROOT/app-store" \
+  | pretty
+run app-store-bundle python3 scripts/inspect-update-bundle.py updater-free \
+  "$RUN_ROOT/app-store/Build/Products/Debug/Underpressured.app"
 
 step "all tests passed (results: $RUN_ROOT/results.tsv)"
