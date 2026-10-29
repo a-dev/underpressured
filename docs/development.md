@@ -232,3 +232,9 @@ In this table, "convert" means Replace Originals with a different output format.
 | After the migration, select Replace Originals, then select the Export folder entry. | The folder picker opens, because the migrated folder is not writable in the sandbox. After you select a folder, the app keeps it after a relaunch and does not ask again. |
 | After the migration, with the Export folder selected, drop one file. Click Grant Access. | A folder panel opens at the Export folder before the scan. The copy shows in the folder. After a relaunch, the next drop shows no panel. |
 | After the migration, with the Export folder selected, drop one file. Cancel the panel. | The item fails with "No permission". The next drop shows the panel again. |
+
+Recorded results:
+
+| Check | Commit | macOS | Reviewer | Date | Result |
+| --- | --- | --- | --- | --- | --- |
+| Drop one file. Convert. Click Grant Access. (Trash off, PNG to JPEG, Debug build signed Apple Development) | `683d3a9` | 27.0.1 (26A434) | a-dev | 2026-10-30 | Pass. The JPEG shows next to the source. The kernel log has no `file-write` deny for the process. |
