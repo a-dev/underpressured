@@ -238,3 +238,6 @@ Recorded results:
 | Check | Commit | macOS | Reviewer | Date | Result |
 | --- | --- | --- | --- | --- | --- |
 | Drop one file. Convert. Click Grant Access. (Trash off, PNG to JPEG, Debug build signed Apple Development) | `683d3a9` | 27.0.1 (26A434) | a-dev | 2026-10-30 | Pass. The JPEG shows next to the source. The kernel log has no `file-write` deny for the process. |
+| Drop one file. Convert. Click Grant Access. (TestFlight 1.1.0 build 3) | `b9239bf`, build number 3 | 27.0.1 (26A434) | a-dev | 2026-10-30 | Pass. The JPEG shows next to the source. |
+| Drop one file. Convert. Cancel the panel. (TestFlight 1.1.0 build 3) | `b9239bf`, build number 3 | 27.0.1 (26A434) | a-dev | 2026-10-30 | Pass. The item fails with "No permission". The source does not change. |
+| Drop one file. Convert with Trash on. Click Grant Access. (TestFlight 1.1.0 build 3) | `b9239bf`, build number 3 | 27.0.1 (26A434) | a-dev | 2026-10-30 | Pass. The JPEG shows next to the source. The original is in the Trash. |
