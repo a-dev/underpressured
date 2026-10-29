@@ -72,7 +72,7 @@ It runs, in sequence:
 4. Native dependency builds.
 5. Swift package tests and app tests.
 6. Checks of the compiler-extracted localization catalogs and the release signatures against the build from this run.
-7. A build of the `UnderpressuredUpdaterFree` scheme in its own folder, and `inspect-update-bundle.py updater-free` on that app.
+7. A build of the `UnderpressuredUpdaterFree` scheme in its own folder, and `inspect-update-bundle.py updater-free` on that app. With `UP_ADHOC_SIGNING=1`, which CI sets, this build is signed ad hoc, because hosted runners have no team certificate. The project's signing settings for App Store archives do not change.
 
 The first failure stops the script with a failing exit status.
 

@@ -77,6 +77,8 @@ jobs:
           UP_TEST_ARTIFACTS: ${{ runner.temp }}/test-gate
           # TEMPORARY: Skip the native UI tests that failed on the hosted runner. The AX tree fix is not yet verified in CI. See scripts/test.sh.
           UP_SKIP_CI_UNSTABLE_UI_TESTS: '1'
+          # The runner has no team signing certificate. Sign the App Store build ad hoc. See scripts/test.sh.
+          UP_ADHOC_SIGNING: '1'
         # In Actions expressions, '' is false. So `cond && '' || x` always gives x.
         run: scripts/test.sh ${{ steps.gate.outputs.full != 'true' && '--fast' || '' }}
 

@@ -96,11 +96,18 @@ run release-signature env \
   python3 scripts/test_release_crypto.py
 
 # The App Store target shares the product name with the direct target, so it builds in its own folder.
+# The project signs this target with the team's Apple Development identity, which hosted runners lack.
+# UP_ADHOC_SIGNING=1 overrides signing for this build only; the project settings that MAS archives use stay unchanged.
+adhoc_signing=()
+if [ "${UP_ADHOC_SIGNING:-0}" = 1 ]; then
+  adhoc_signing=(CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= PROVISIONING_PROFILE_SPECIFIER=)
+fi
 run app-store-build xcodebuild build \
   -project Underpressured.xcodeproj \
   -scheme UnderpressuredUpdaterFree \
   -destination 'platform=macOS,arch=arm64' \
   -derivedDataPath "$RUN_ROOT/app-store" \
+  ${adhoc_signing[@]+"${adhoc_signing[@]}"} \
   | pretty
 run app-store-bundle python3 scripts/inspect-update-bundle.py updater-free \
   "$RUN_ROOT/app-store/Build/Products/Debug/Underpressured.app"
