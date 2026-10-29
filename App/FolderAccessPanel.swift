@@ -35,6 +35,9 @@ final class FolderAccessPanel: FolderAccess {
                 bundle: .main,
                 comment: "Message in the folder panel shown when the remembered Export folder is no longer accessible, for example after moving from the direct download. Placeholder is a folder name.")
         }
-        _ = await panel.begin()
+        guard await panel.begin() == .OK else { return }
+        // Reading the chosen URL consumes the sandbox extension for it; until then the grant stays in the panel.
+        // The caller checks `canCreateFiles(in:)` again, so choosing another folder or cancelling is safe.
+        _ = panel.url
     }
 }
