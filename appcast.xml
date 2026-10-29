@@ -3,14 +3,17 @@
     <channel>
         <title>Underpressured</title>
         <item>
-            <title>1.0.0</title>
-            <pubDate>Wed, 28 Oct 2026 23:56:42 +0400</pubDate>
-            <sparkle:version>1</sparkle:version>
-            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <title>1.1.0</title>
+            <pubDate>Fri, 30 Oct 2026 01:29:01 +0400</pubDate>
+            <sparkle:version>3</sparkle:version>
+            <sparkle:shortVersionString>1.1.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>27.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Underpressured 1.0.0</h2><ul><li>First release with automatic updates.</li></ul>
+            <description><![CDATA[<h2>Underpressured 1.1.0</h2>
+<ul>
+<li>The Help menu has a Privacy Policy item, and Settings &gt; Support has a Privacy Policy link. Both open the privacy policy in your browser.</li>
+<li>The quality help text now reads “Higher quality keeps more detail, while lower quality makes smaller files.”</li></ul>
 ]]></description>
-            <enclosure url="https://github.com/a-dev/underpressured/releases/download/1.0.0-1/Underpressured-1.0.0-1.zip" length="4107696" type="application/octet-stream" sparkle:edSignature="JCLTL+drrwBWmStmlnWNKTL67al1Smh2Cq03AjaKIXbUWs2cIYWhl12xw74DrBo7OfLtaPkc70yW83pwiwXaBQ=="/>
+            <enclosure url="https://github.com/a-dev/underpressured/releases/download/1.1.0-3/Underpressured-1.1.0-3.zip" length="4124503" type="application/octet-stream" sparkle:edSignature="NZQsr3iGkokOchF5eLUl5gJuCKiAqDVF9QneI8GpjQ6+l3GkySQKUa0aFL5+va5nWPNdsMzgrtd6F5oClyO+Ag=="/>
         </item>
     </channel>
 </rss>
