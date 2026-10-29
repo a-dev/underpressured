@@ -1,53 +1,74 @@
 # App behavior
 
-## 1. Purpose
+Underpressured compresses, resizes, and converts still images in batches. All processing occurs on the Mac.
 
-Underpressured compresses, resizes, and converts still images in batches. All processing runs locally.
+## 1. Platform
 
-## 2. Platform
+The app needs Apple Silicon and macOS 27 or later. The direct-distribution app has no sandbox. The updater-free app uses the App Sandbox. On its first launch, macOS moves the direct-distribution app's settings into its container, so the direct-distribution app then starts with initial settings. [Build variants](development.md#build-variants) has the details.
 
-The app targets Apple Silicon and macOS 27 or later. The direct-distribution app is not sandboxed. The updater-free app runs in the App Sandbox. On its first launch, before its container exists, macOS moves the direct-distribution app's settings into the container. The direct-distribution app then starts with initial settings. See [Release](release.md) for signing and distribution.
+## 2. Main window
 
-## 3. Main window
+### Layout
 
-The header contains preset badges and an add button. Badges wrap into rows. When the rows exceed 90 points, the preset area scrolls vertically. Keyboard focus scrolls the focused badge into view. Short lists keep their natural height. The content row below the presets contains destination controls and Clear. Output Format belongs to each preset's popover.
+- The header shows preset badges and an add button. Badges wrap into rows. If the rows are taller than 90 points, the preset area scrolls vertically. Keyboard focus scrolls the focused badge into view.
+- Below the presets, a row shows the destination controls and Clear. Output Format is in each preset's popover.
+- The empty window shows an import symbol and "Choose files or drop images or folders." A click opens the file picker. The idle footer shows "Choose a preset and where to save, then add files."
+- The list groups items by batch. Each row shows the name, relative folder path, state, sizes, savings, and a reason or note if one applies. Growth shows as a positive percentage.
 
-The empty window shows an import symbol and "Choose files or drop images or folders." Clicking it opens the file picker. The idle footer says "Choose a preset and where to save, then add files." The empty window accepts files and folders. File Open, Dock drops, and Open With use the same intake path.
+Open, drops on the window or the Dock, File Open, and Open With all use the same intake path.
 
-The list groups items by batch. Rows show the name, relative folder path, state, sizes, savings, and any reason or note. Growth has a positive percentage.
+### Selection and file commands
 
-Click, Command-click, Shift-click, and arrow keys control selection. Double-click or Return opens available files. Space toggles Quick Look. Arrow keys move through the list while Quick Look is open.
+- Click, Command-click, Shift-click, and the arrow keys change the selection.
+- Double-click or Return opens the available files. Space toggles Quick Look. The arrow keys move through the list while Quick Look is open.
+- Open, Quick Look, and Show in Finder use the output of an optimized item, and the exported copy or source of a skipped item. Missing files and unfinished, failed, or cancelled items are not available.
+- The context menu has the three commands. It targets the clicked row, or the selection if the clicked row is selected.
+- The commands act on the eligible files in list order, and are disabled if no file is eligible. Each command checks availability again when it runs.
+- Each available row has the three commands as accessibility actions.
 
-Open, Quick Look, and Show in Finder use the written output for optimized items. Skipped items use their exported copy or source. Missing files and unfinished, failed, or cancelled items are unavailable.
+### Progress, results, and filters
 
-The selection context menu offers all three commands. Context-clicking an unselected row targets that row. Context-clicking a selected row targets the selected set. Mixed selections act on eligible files in list order, and all commands are disabled when none are eligible. Actions recheck availability when invoked. Show in Finder reveals the eligible files together. Each available row also has named Open, Quick Look, and Show in Finder accessibility actions.
+- During processing, the footer shows progress, savings, and Cancel. At completion, a summary and outcome filters replace the progress.
+- The active filter has a checkmark, a tint, the selected accessibility trait, and the value "showing". The checkmark is hidden from accessibility.
+- A filter does not move focus to the list. A filter clears the selection of rows that it hides. When the rows show again, the app does not select them again. Quick Look follows the selected files that can still open. It closes when none remain.
+- Clear removes result history, selection, filters, and the summary. Clear is available only when processing and intake are idle. You cannot undo Clear. Clear does not change image files.
 
-Clear removes result history, selection, filters, and the completion summary when processing and intake are idle. You cannot undo Clear. Clear does not change image files. During processing, the footer shows progress, savings, and Cancel. Completion replaces progress with a summary and outcome filters. The active filter has a persistent checkmark as well as its tint, selected accessibility trait, and "showing" value. The checkmark is hidden from accessibility.
+### Runs and focus
 
-A run starts when valid, nonempty intake starts while the app is idle. It includes all intake received until pending scans, admissions and unfinished items settle. A temporary gap in queued processing does not end the run while a scan is pending. Active progress and background completion notifications describe that run. The completion banner summarizes retained result history, which can span multiple runs, and offers filters for outcomes in that history. A background completion posts a notification when permission allows it.
+- Progress and background notifications describe the current [Run](GLOSSARY.md#processing). The app sends a background notification only if the user allows notifications.
+- The completion banner and its filters cover all result history, which can contain many Runs.
+- An admitted batch can move focus to the file list only if no other control has focus. An admission never takes focus from a preset editor or another control.
 
-A nonempty batch admission can focus the file list when its window has no occupied control, or keep focus in an already focused list. Admissions preserve active preset editors and other focused controls. Filtering does not request list focus. Filtering clears selected rows that become hidden. Showing those rows again does not restore their selection. Quick Look follows the remaining selected openable files and closes when none remain.
+### Quit and sleep
 
-Closing the window quits the app. Quitting during processing asks for confirmation. Return selects Cancel and Quit. Escape and Command-period select Keep Running. Accepted quit waits for cancellation and queue idle before replying to the system termination request. The app prevents idle system sleep while the queue runs.
+Closing the window quits the app. If processing is active, the app asks for confirmation:
+
+- Return selects Cancel and Quit.
+- Escape and Command-period select Keep Running.
+
+After the user accepts, the app cancels, waits for the queue to become idle, and then replies to the system quit request. While the queue runs, the app prevents idle system sleep.
 
 | Shortcut | Action |
 | --- | --- |
 | Command-O | Open files or folders |
-| Command-1 through Command-9 | Activate a preset |
+| Command-1 to Command-9 | Activate a preset |
 | Command-comma | Open Settings |
 | Command-period | Cancel the queue |
 
-## 4. Presets
+## 3. Presets
 
-Each preset stores a name, quality, lossless flag, resize rule, metadata flag, and output format. Destination is separate.
+A preset stores a name, quality, the lossless flag, a resize rule, the keep-metadata flag, and an output format. The destination is not part of a preset.
 
-All built-in preset names follow the app language, including Balanced JPEG, Web, Small, and Screenshots PNG. Format names such as JPEG and PNG remain unchanged. Custom names, including renamed built-in presets, stay exactly as entered when the language changes. Legacy presets without a built-in identifier retain their stored names.
+### Values
 
-A name has 1 to 70 composed characters, measured as Unicode grapheme clusters. The editor trims surrounding whitespace. It truncates longer edits to 70 characters. Two presets can have the same name. An empty or whitespace-only edit restores the previous name. Quality is 0 to 100. Lossless disables it. The disabled slider stays visible to accessibility, with its value and a note that Lossless does not use it. The name field has the accessibility label Name.
+- A name has 1 to 70 Unicode grapheme clusters. The editor removes whitespace at the start and end, and cuts longer text to 70. Two presets can have the same name. An empty or whitespace-only edit restores the previous name. The name field has the accessibility label "Name".
+- Quality is 0 to 100. Lossless disables the quality slider. The disabled slider stays visible to accessibility, with its value and a note that Lossless does not use it.
+- A resize rule limits the width, the height, or the longer edge. Images keep their aspect ratio and never get larger.
+- Construction, edits, and restoration clamp quality to 0–100 and resize limits to at least 1 pixel.
 
-Resize rules limit width, height, or the longer edge. Images retain their aspect ratio and never enlarge.
+### Starter presets
 
-The starter values match `UnderpressuredCore/Presets/PresetRules.swift`.
+The values come from `UnderpressuredCore/Presets/PresetRules.swift`. All starters have Lossless off. Balanced JPEG is active at first.
 
 | Starter preset | Quality | Maximum long edge | Output | Keep metadata |
 | --- | --- | --- | --- | --- |
@@ -56,128 +77,147 @@ The starter values match `UnderpressuredCore/Presets/PresetRules.swift`.
 | Small | 60 | 1080 pixels | Original | Off |
 | Screenshots PNG | 70 | No limit | PNG | On |
 
-All starters disable Lossless. Balanced JPEG is initially active.
+Starter names follow the app language. Format names, such as JPEG and PNG, do not change. Custom names, and starter presets that the user renamed, keep their text when the language changes. Old presets without a starter identifier keep their stored names.
 
-Edits apply immediately. Add duplicates and activates the active preset. Presets support duplication, removal, and reordering. A preset list contains 1–20 presets with distinct identities and exactly one active member. The last preset cannot be removed. Construction, edits and restoration clamp quality to 0–100 and resize limits to at least one pixel. Preset identity is immutable. Duplication creates a new identity.
+### Edits
 
-Move Earlier and Move Later in each badge's context menu and the Presets menu move one position. The application menu targets the active preset. Boundary commands are disabled. Named accessibility actions offer only possible moves, retain the moved badge's focus, and request an announcement of its resulting position. Movement preserves IDs and activation, updates numeric shortcut positions and saved order, and uses the same undo history as dragging.
+- Edits apply immediately. Edits do not change batches that are already in the queue.
+- Add duplicates the active preset and activates the copy. Presets can also be duplicated, removed, and moved.
+- The list has 1 to 20 presets with different identities and exactly one active preset. You cannot remove the last preset.
+- A preset's identity never changes. A duplicate gets a new identity.
+- Removing the active preset activates the next preset, or the previous one if the removed preset was last.
 
-Preset creation, duplication, removal, movement, and field edits support Undo and Redo through the Edit menu, Command-Z, and Command-Shift-Z. Restoring a preset preserves its ID, values, and position. A slider drag is one operation. Name edits form one operation per editing session. Command-Z in a focused text field retains native text undo. Empty names revert to the name at editor opening and do not create a history entry when nothing changed.
+### Move
 
-Activation alone does not create an undo entry. Removing the active preset activates its next neighbor, or its previous neighbor at the end. Undo restores the removed preset's active state unless the user explicitly activated a preset afterward, including selecting the automatic fallback. Redo follows the same rule: it preserves a later explicit activation if that preset survives, otherwise it uses the recorded destination state's active preset. Structural undo runs in reverse order, so undoing an addition frees its slot before an earlier removal is restored at the 20-preset limit.
+- Move Earlier and Move Later are in each badge's context menu and in the Presets menu. Each command moves the preset one position. The application menu acts on the active preset. At the start or end of the list, the related command is disabled.
+- The accessibility actions show only possible moves. After a move, focus stays on the badge, and the app announces its new position.
+- A move keeps IDs and the active preset. It updates the numeric shortcuts and the saved order. A move uses the same undo history as a drag.
 
-Removal from the editor waits until its popover closes. Undo restores the preset without reopening that popover. Removal and restoration request focus on a surviving neighbor or the restored badge.
+### Undo
 
-Settings persist after Undo and Redo. Undo history exists only for the current app session. Rows and selection do not persist. Editing a preset does not change batches already queued. Preset undo does not restore cleared results or image files.
+- Undo and Redo (Command-Z, Command-Shift-Z) apply to create, duplicate, remove, move, and field edits. Activation alone adds no undo step.
+- Undo restores a preset with its ID, values, and position.
+- One slider drag is one step. One name-editing session is one step. In a focused text field, Command-Z uses native text undo.
+- Undo of a removal restores the removed preset's active state. Exception: if the user activated a preset after the removal, including the automatic fallback, that choice stays. Redo uses the same rule. It keeps a later explicit activation if that preset still exists. Otherwise, it uses the active preset that the app recorded.
+- Undo runs in reverse order. At the 20-preset limit, undo of an addition frees a slot before undo restores an earlier removal.
+- A removal from the editor occurs after the popover closes. Undo does not open the popover again. Focus moves to a neighbor or to the restored badge.
+- Undo history lasts for the app session. Undo does not restore cleared results or image files. Rows and selection are not saved.
 
 ### Stored preset recovery
 
-The decoder enforces the following recovery contract. Destination preferences recover independently and are preserved when presets fall back to starters.
+The decoder applies these rules when it loads presets. Destination preferences recover on their own. They stay even when presets fall back to the starters.
 
 | Stored input | Recovery |
 | --- | --- |
-| Missing settings | Initial defaults |
-| Malformed preset payload, unknown version or empty list | Use starter presets |
-| Blank/long name, out-of-range quality or nonpositive resize limit | Normalize each field using the existing rules. Blank stored names use "Preset" |
-| Active ID absent from list | Select the first preset |
-| Legacy preset without output format or starter identifier | Use Original output. Retain its stored name without assigning a starter identifier |
-| Duplicate preset IDs | Reject the entire preset list and use starters. Do not invent replacement IDs |
-| More than 20 presets | Reject the entire preset list and use starters. Do not silently truncate |
+| No settings | Initial defaults |
+| Bad preset data, unknown version, or empty list | Use the starter presets |
+| Blank or long name, quality out of range, or resize limit of 0 or less | Correct each field with the normal rules. A blank stored name becomes "Preset" |
+| Active ID not in the list | Select the first preset |
+| Old preset without output format or starter identifier | Use Original output. Keep the stored name. Do not add a starter identifier |
+| Two presets with the same ID | Reject the full list and use the starters. Do not make new IDs |
+| More than 20 presets | Reject the full list and use the starters. Do not cut the list |
 
-Duplicate names remain valid. A list with two different presets sharing an ID is invalid even if the active ID matches. A 21-entry list is invalid even if its active entry would survive truncation. Recovery takes effect in memory at load. The normal save path persists it. Loading does not create a separate write or backup.
+Recovery changes only the loaded values. The next normal save writes them. Loading writes no file and no backup.
 
-## 5. Output format
+## 4. Output format
 
 | Input | Original output | JPEG output | PNG output |
 | --- | --- | --- | --- |
 | JPEG | JPEG | JPEG | PNG |
-| PNG | PNG | JPEG with transparency flattened onto white | PNG |
-| HEIC, WebP, TIFF, AVIF, JPEG XL | Skipped with a conversion hint | JPEG | PNG |
+| PNG | PNG | JPEG, with transparency flattened onto white | PNG |
+| HEIC, WebP, TIFF, AVIF, JPEG XL | Skipped, with a conversion hint | JPEG | PNG |
 
-Decode support also depends on ImageIO. GIF, RAW, animated images, and multi-page TIFFs are unsupported.
+Decoding also depends on ImageIO. The app does not support GIF, RAW, animated images, or multi-page TIFF.
 
-Conversion uses `.jpg` or `.png`. Original output preserves the source extension and its case.
+A conversion uses `.jpg` or `.png`. Original output keeps the source extension and its letter case.
 
-## 6. Destination
+## 5. Destination
 
-The Destination control shows both Replace Originals and Export Copies. Export Copies reuses the remembered folder when it exists, is a directory, and is writable. Otherwise, it requests a folder. A sandboxed app that cannot reopen the remembered folder after relaunch also requests it. Cancelling leaves the previous destination unchanged. The folder menu offers Choose Another Folder, Show in Finder, and Forget Folder. Forget Folder selects replacement and clears the remembered folder.
+### Controls
 
-Move original to Trash appears beside replacement controls only in replacement mode. Its preference survives mode changes. Destination changes affect later intake only.
+- The Destination control shows Replace Originals and Export Copies. A change applies only to later intake.
+- Export Copies uses the remembered folder if it exists, is a folder, and is writable. If not, the app asks for a folder. The sandboxed app also asks if it cannot open the remembered folder after a relaunch. If the user cancels, the destination does not change.
+- The folder menu has Choose Another Folder, Show in Finder, and Forget Folder. Forget Folder selects Replace Originals and clears the remembered folder.
+- "Move original to Trash" shows only in Replace Originals mode. Its value stays when the mode changes.
+- At small window widths, the folder name is cut in the middle, so Clear stays visible. The folder control shows its full path in its help and its accessibility value.
 
-Replace originals writes a same-format result atomically at the source path. Conversion writes a sibling file before removing the source.
+### Replace Originals
 
-A sandboxed app can have access to a dropped file but not to its folder, and a conversion must create a new file there. After scanning and before admission, intake finds the folders of loose files that it will convert. For each folder where the app cannot create files, a folder panel opens at that folder with a Grant Access button. One panel appears for each folder, in intake order. Files inside dropped folders, Export Copies, same-format results, and the direct-distribution app never show the panel. If the user cancels the panel, the items are still admitted, and their conversions fail with No permission. Cancel while the panel is open discards that intake when the panel closes.
+- A same-format result replaces the source atomically at the source path.
+- A conversion writes a new file next to the source, then removes the source.
+- With "Move original to Trash", the app moves replaced sources to the Trash. If a volume has no Trash, the item fails. Skipped sources do not change.
 
-Export Copies can capture a remembered Export folder that the sandboxed app cannot write, such as one moved from the direct-distribution app. Before scanning, intake opens a folder panel at that folder with a Grant Access button. After a grant, the app saves the folder again, so later launches reopen it without a panel. If the user cancels, the items are still admitted, and their exports fail with No permission. A missing Export folder shows no panel and fails with Export folder unavailable.
+### Export Copies
 
-Move originals to Trash sends replaced sources to the Trash. A volume without Trash produces a failure. Skipped sources remain untouched.
+- The Export folder copies the dropped folder structure. Loose files go into the Export folder root. The scan does not include the Export folder.
+- Items that are already optimal or already optimized export an unchanged copy with a new optimization mark. Other skipped items make no copy.
+- If the remembered Export folder is missing, the item fails with "Export folder unavailable". The app keeps the remembered path.
 
-At constrained widths, the export-folder name truncates in the middle so Clear remains visible. The folder control exposes its full path through help and its accessibility value.
+### Folder access in the sandboxed app
 
-Export folder preserves sources and mirrors dropped folder paths. Loose files go into the export root. Scanning excludes the export folder.
+A dropped file gives the sandboxed app access to that file, not to its folder. A conversion must create a new file in that folder.
 
-Already-optimal and already-optimized items export unchanged copies with fresh optimization marks. Other skipped items produce no copy.
+- Before admission, the app finds the folders where it must convert a loose file but cannot create files. For each folder, in intake order, a panel opens at that folder with a Grant Access button.
+- The panel does not show for files inside dropped folders, for Export Copies, for same-format results, or in the direct-distribution app.
+- If the user cancels the panel, the app still admits the items. Their conversions fail with "No permission".
+- If the user cancels the queue while the panel is open, the app discards that intake.
 
-Name clashes add the first available suffix, such as `photo-2.jpg`. Planned paths stay reserved until all admitted queue work drains. Pending scans alone do not retain those reservations. Comparisons follow the volume's case sensitivity.
+If the sandboxed app cannot write the remembered Export folder (for example, a folder from the direct-distribution app), the same panel opens before the scan. After a grant, the app saves the folder again, so later launches need no panel. If the user cancels, the exports fail with "No permission". A missing Export folder shows no panel.
 
-An existing export with a valid optimization mark can be refreshed. Unrelated files cannot be overwritten.
+### Name clashes
 
-For example, two same-name images admitted during overlapping processing receive distinct reserved paths, even if the first finishes before the second writes. If processing drains while a later intake is still scanning, that later batch uses fresh reservations and may refresh the earlier valid marked export. Both batches can still belong to one run for completion totals. Historical row output paths refer to the current file at that location, not an archived version of its bytes.
+- A name clash adds the first free number, for example `photo-2.jpg`. Comparisons follow the case sensitivity of the volume.
+- The app reserves planned paths until all admitted work is done. A pending scan alone does not keep reservations.
+- The app can replace an existing export that has a valid optimization mark. It never replaces an unrelated file. So a batch admitted after the queue empties can replace an earlier export from the same Run.
+- A row's output path refers to the file at that location now, not to a stored copy.
 
-Writes use temporary files on the destination volume, outside the destination folder. Before committing, the pipeline checks the source's identity, size, and modification date.
+### Safe writes
 
-Written files retain source dates, Finder tags, and permissions. A changed source produces a failure instead of a replacement.
+- The app writes to temporary files on the destination volume, outside the destination folder.
+- Before the commit, the app checks the source identity, size, and modification date. If the source changed, the item fails and the app does not replace it.
+- Written files keep the source dates, Finder tags, and permissions.
 
-## 7. Processing
+## 6. Processing
 
-Each intake creates a batch with immutable captured preset settings, output format, label, identity and destination. Batches enter the queue in intake order. Queue owns execution state. Published item rows are independent values. Admission rejects a candidate batch with duplicate item IDs or batch/item IDs colliding with active execution before emitting events or reserving sources. IDs can be reused once their execution records retire.
-
-Folder scanning skips hidden descendants, packages, and symbolic links. Explicitly dropped hidden files and folders are accepted. Non-image files are counted and ignored.
-
-A source already waiting or processing becomes skipped. Item states are waiting, processing, and finished. Finished outcomes are optimized, skipped, failed, or cancelled.
+- Each intake makes a batch. The batch captures the preset settings, output format, label, identity, and destination. These values never change.
+- Batches enter the queue in intake order.
+- A folder scan skips hidden items, packages, and symbolic links inside the folder. The app accepts hidden files and folders that the user drops directly. The scan counts non-image files and ignores them.
+- If a source already waits or processes, the new item is skipped.
+- Item states are waiting, processing, and finished. A finished item has an outcome: optimized, skipped, failed, or cancelled.
 
 ### Encode paths
 
 | Output | Lossy | Lossless |
 | --- | --- | --- |
-| JPEG source without resize | Progressive jpegli encode at the preset quality | Coefficient-preserving progressive rewrite |
+| JPEG source, no resize | Progressive jpegli encode at the preset quality | Progressive rewrite that keeps the coefficients |
 | JPEG after resize or conversion | Progressive jpegli encode | Visually lossless encode at Butteraugli distance 1.0 |
-| PNG | Palette search, with full-color fallback | oxipng optimization |
+| PNG | Palette search, with a full-color fallback | oxipng optimization |
 
-PNG palette acceptance uses a quality-dependent SSIMULACRA2 floor. `ImageEngine/Native/PNGPalette.swift` defines the curve. Quality 98 or higher uses lossless PNG.
-
-Lossless controls encoding. Resize and conversion still work. PNG keeps the pixels after the transform. JPEG keeps its coefficients only when there is no pixel transform. A resized or converted JPEG uses visually lossless encoding. The preset editor explains these limits.
-
-Resize uses vImage Lanczos in linear light. PNG optimization uses oxipng level 2. Native encode failures use an ImageIO fallback only when it meets the selected fidelity contract. Lossless JPEG paths fail if their native encoder is unavailable.
+- A PNG palette must pass a SSIMULACRA2 floor that depends on quality. `ImageEngine/Native/PNGPalette.swift` has the curve. At quality 98 or more, the app uses lossless PNG.
+- Lossless controls only the encode. Resize and conversion still apply. PNG keeps the pixels after the transform. JPEG keeps its coefficients only when there is no pixel transform. A resized or converted JPEG uses a visually lossless encode. The preset editor explains these limits.
+- Resize uses vImage Lanczos in linear light. PNG optimization uses oxipng level 2.
+- If a native encoder fails, the app uses ImageIO only if the result meets the selected fidelity. A lossless JPEG path fails if its native encoder is not available.
 
 ### Color and metadata
 
-The encoder keeps the color profile. Re-encoding converts CMYK to sRGB. Only lossless PNG retains 16-bit channels. JPEG output flattens transparency onto white.
-
-Keep metadata retains EXIF, GPS, IPTC, and XMP. Pixel transforms normalize orientation. Lossless JPEG rewriting preserves the orientation tag even when other metadata is removed.
-
-The encoder removes HDR gain maps and adds an HDR note.
+- The encoder keeps the color profile. A re-encode converts CMYK to sRGB. Only lossless PNG keeps 16-bit channels. JPEG output flattens transparency onto white.
+- Keep metadata keeps EXIF, GPS, IPTC, and XMP. A pixel transform applies the orientation to the pixels. A lossless JPEG rewrite keeps the orientation tag, even when it removes other metadata.
+- The encoder removes HDR gain maps and adds an HDR note.
 
 ### Size and optimization marks
 
-When format and dimensions remain unchanged, an output that is not smaller becomes skipped as already optimal. Conversion and resize may produce larger files.
-
-Every written file receives an optimization mark. The mark records its version, effective settings, resolved format, file size, and modification date.
-
-Matching settings and a valid mark skip repeated processing. A size change or a change to the modification date's nearest millisecond invalidates the mark. Milliseconds are measured from the Unix epoch and half-millisecond ties round away from zero. Dates in the same millisecond bucket remain indistinguishable, even if the file changed. Existing version 1 marks use the stored millisecond value under this same rule. Losing the mark causes processing to run again.
+- If the format and dimensions do not change and the output is not smaller, the item is skipped as already optimal. A conversion or a resize can make a larger file.
+- Each written file gets an optimization mark. The mark records its version, the settings, the resolved format, the file size, and the modification date.
+- If the settings match and the mark is valid, the app skips the file.
+- A change in size, or in the modification date at millisecond precision, makes the mark invalid. The app counts milliseconds from the Unix epoch. A half-millisecond rounds away from zero. The app cannot detect a change inside the same millisecond. Version 1 marks use their stored millisecond value with the same rule.
+- If the mark is lost, the app processes the file again.
 
 ### Cancellation
 
-Cancel applies to the entire queue. Waiting items cancel immediately. Processing stops between stages. A codec call already in progress finishes before cancellation takes effect.
+- Cancel applies to the full queue. Waiting items cancel immediately. A processing item stops between stages. A codec call that already started finishes first.
+- Cancellation removes temporary files. Completed items and committed outputs stay.
+- If the app cannot remove the source after a successful conversion, the result gets a note. The committed output stays.
 
-Cancellation removes temporary files. Completed items remain completed. Cancellation preserves completed outputs.
-
-A commit is the point at which an output becomes visible at its destination. Cancellation after commit must retain the successful output. Failure to clean up a source after a successful converted output is a note on that result, not cancellation or rollback of the committed output.
-
-## 8. Diagnostics and verification
+## 7. Logs
 
 The app writes structured Console logs under `app.underpressured.Underpressured`, including item results and codec errors.
-
-[Build and test](development.md) lists the automated checks. [Native interaction checks](development.md#native-gestures-and-voiceover) and [release build checks](release.md#release-build-checks) cover manual verification.
-
-Ownership and source locations are in [Architecture](architecture.md).

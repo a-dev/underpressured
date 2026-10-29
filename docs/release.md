@@ -2,26 +2,34 @@
 
 This guide is for the release operator. Keep all signing credentials and keys out of the repository.
 
-Updates are hosted on GitHub. The feed is `https://a-dev.github.io/underpressured/appcast.xml`, served by GitHub Pages from the `gh-pages` branch. Each version's ZIP and DMG are assets of the GitHub Release tagged `<VERSION>-<BUILD>`. The public EdDSA key is `NqMprqjIRcvw1MUhKIQJviJX+LLY6zB5vj7+yl2n7QU=`. The Release build settings and `scripts/release.py` use these values by default.
+## Hosting
+
+| Item | Value |
+| --- | --- |
+| Update feed | `https://a-dev.github.io/underpressured/appcast.xml`, from the `gh-pages` branch through GitHub Pages |
+| ZIP and DMG | Assets of the GitHub Release with the tag `<VERSION>-<BUILD>` |
+| Public EdDSA key | `NqMprqjIRcvw1MUhKIQJviJX+LLY6zB5vj7+yl2n7QU=` |
+
+The Release build settings and `scripts/release.py` use these values by default.
 
 ## Steps
 
-1. Set the version and build in [Config/Version.xcconfig](../Config/Version.xcconfig). The build is a positive integer. It must be greater than every published build, also withdrawn ones. Never use a build number again.
-2. Make a release candidate with `scripts/release.sh`. Do the dry run first.
-3. Publish the candidate with `scripts/publish-github.py`. Do the plan first.
-4. Add an arm64-only Homebrew cask to the personal tap: version, SHA-256, DMG URL, macOS 27 minimum, and uninstall paths. Run `brew audit --cask --strict`.
-5. Do the release-build checks in [Release build checks](#release-build-checks).
+1. Set the version and the build in [Config/Version.xcconfig](../Config/Version.xcconfig). The build is a positive integer. It must be greater than all published builds, including withdrawn builds. Never use a build number again.
+2. [Make a release candidate](#make-a-release-candidate) with `scripts/release.sh`. Do the dry run first.
+3. [Publish](#publish) the candidate with `scripts/publish-github.py`. Do the plan first.
+4. Add an arm64-only Homebrew cask to the personal tap, with the version, SHA-256, DMG URL, macOS 27 minimum, and uninstall paths. Run `brew audit --cask --strict`.
+5. Do the [release build checks](#release-build-checks).
 6. Add the DMG and Homebrew install commands to the root README.
 
 ## Make a release candidate
 
 Prepare these local inputs:
 
-- A history file with all published builds, for example `{"published_builds": [1, 2]}`. For the first release, use `{"published_builds": []}`. The script checks the file format. It does not check that the list is complete.
-- HTML release notes.
+- A history file with all published builds, for example `{"published_builds": [1, 2]}`. The script checks the file format. It does not check that the list is complete.
+- The release notes in HTML.
 - The private key file, outside the checkout, with mode `0600` or stricter.
 
-Run the dry run:
+Do the dry run:
 
 ```sh
 scripts/release.sh --dry-run \
@@ -33,122 +41,91 @@ scripts/release.sh --dry-run \
   --team TEAMID0000 --notary-profile underpressured-release
 ```
 
-`--feed-url`, `--public-key` and `--download-url-prefix` default to the GitHub hosting values. The default download prefix is `https://github.com/a-dev/underpressured/releases/download/<VERSION>-<BUILD>`.
+The dry run reads the inputs and prints the commands. It does not run them. It does not use Keychain, connect to a server, or write output.
 
-The dry run reads the inputs and prints the commands. It does not run them, use Keychain, connect to a server, or write output.
+`--feed-url`, `--public-key`, and `--download-url-prefix` use the GitHub hosting values by default. The default download prefix is `https://github.com/a-dev/underpressured/releases/download/<VERSION>-<BUILD>`.
 
-For a real release, remove `--dry-run` and add `--acknowledgements-reviewed`. This flag is your statement that you examined the licenses. It is not an automatic audit. The live run needs:
+For a real release, remove `--dry-run` and add `--acknowledgements-reviewed`. With this flag, you state that you examined the licenses. The script does not audit them. The real run needs:
 
 - a clean checkout with `LICENSE`
 - Xcode 27 or later
 - the Developer ID identity
 - a `notarytool` Keychain profile
 - a private key that matches the public key
-- Sparkle 2.10.0 tools, resolved by Xcode into `DerivedData/SourcePackages/artifacts/sparkle/Sparkle/bin`. Use `--sparkle-bin` for a different location.
+- the Sparkle 2.10.0 tools. Xcode puts them in `DerivedData/SourcePackages/artifacts/sparkle/Sparkle/bin`. For a different location, use `--sparkle-bin`.
 
 The script does these steps:
 
 1. Builds the native dependencies.
-2. Archives an arm64 app with Hardened Runtime and a secure timestamp, and exports it with Developer ID.
+2. Archives an arm64 app with Hardened Runtime and a secure timestamp. Exports it with Developer ID.
 3. Notarizes the app, requires `Accepted`, keeps the notary logs, and staples the app.
 4. Makes the update ZIP from the stapled app with `ditto --keepParent --sequesterRsrc`.
-5. Makes a DMG with the app and an Applications link, then signs, notarizes, and staples it.
-6. Signs the ZIP and makes a feed with one item. Sparkle and a separate CryptoKit check both check the signature. Deltas are off.
-7. Writes `SHA256.json` with the hashes of the DMG, ZIP, and feed.
+5. Makes a DMG with the app and an Applications link. Signs, notarizes, and staples the DMG.
+6. Signs the ZIP and makes a feed with one item. Sparkle and a separate CryptoKit check both verify the signature. Delta updates are off.
+7. Writes `SHA256.json` with the hashes of the DMG, the ZIP, and the feed.
 
-If a step fails, the script stops and keeps the partial output. Read the notary logs. Fix the cause and run again into a new, empty output directory. Do not change the files after signing. A changed archive needs new signatures.
+If a step fails, the script stops and keeps the partial output. Read the notary logs. Fix the cause. Run the script again with a new, empty output folder. Do not change files after signing, because a changed archive needs new signatures.
 
-Local tests: `python3 scripts/test_release.py` with mocks and `python3 scripts/test_release_crypto.py` with temporary keys. `scripts/test.sh` runs both.
+`scripts/test.sh` runs the local tests: `scripts/test_release.py` with mocks, and `scripts/test_release_crypto.py` with temporary keys.
 
 ## Publish
 
-Do this one-time setup before the first release:
+Before the first release, do this setup one time:
 
 1. Create an empty `gh-pages` branch and push it.
-2. In the repository settings, set Pages to deploy from `gh-pages`, root folder.
-3. Sign in with `gh auth login`, using an account that can create releases and push to `gh-pages`.
+2. In the repository settings, set Pages to deploy from the root of `gh-pages`.
+3. Run `gh auth login` with an account that can create releases and push to `gh-pages`.
 
-Plan the publish. The plan makes no network requests:
+Make the plan. The plan sends no network requests:
 
 ```sh
 scripts/publish-github.py --candidate /private/tmp/underpressured-candidate --notes /private/tmp/release-notes.md
 ```
 
-To publish, add `--publish`. The script does these steps in this order. It changes the feed last, so a failure keeps the old feed:
+To publish, add `--publish`. The script does these steps in this order:
 
-1. Checks the candidate bytes against `SHA256.json`, and checks that the URLs are the GitHub hosting URLs.
-2. Reads the live feed. It refuses a build that is not greater than the live one.
-3. Creates the GitHub Release `<VERSION>-<BUILD>` with the ZIP, DMG and `SHA256.json`.
+1. Checks the candidate files against `SHA256.json`. Checks that the URLs are the GitHub hosting URLs.
+2. Reads the live feed. Stops if the build is not greater than the live build.
+3. Creates the GitHub Release `<VERSION>-<BUILD>` with the ZIP, the DMG, and `SHA256.json`.
 4. Downloads the assets without credentials and compares the bytes.
-5. Replaces `appcast.xml` on `gh-pages`. The update fails if the file changed after step 2.
+5. Replaces `appcast.xml` on `gh-pages`. This step fails if the file changed after step 2.
 
-If step 3 or 4 fails, delete the incomplete release and its tag, then run again. If the candidate must change, make a new candidate with a higher build. Pages can take a few minutes to serve the new feed.
+The script changes the feed last, so a failure keeps the old feed.
 
-To withdraw a release, put the previous `appcast.xml` back on `gh-pages`. Never use its build again.
+- If step 3 or 4 fails, delete the incomplete release and its tag, then run the script again.
+- If the candidate must change, make a new candidate with a greater build.
+- GitHub Pages can need a few minutes to serve the new feed.
+- To withdraw a release, put the previous `appcast.xml` back on `gh-pages`. Never use the withdrawn build number again.
 
-`scripts/publish-release.py` and `scripts/publication-store.py` remain as the adapter for a self-hosted service. GitHub publishing does not use them.
-
-### Service contract
-
-No production service exists yet. `scripts/publication-store.py` is a local reference store for tests. It is not a deployed service.
-
-Each service URL is a base. The service must implement:
-
-- `GET /state` returns the revision, `feed_sha256`, releases, and `published_builds`. An empty feed uses a null hash. Each release includes build, identity, and status. Status is `reserved`, `assets`, or `feed`. The build list includes failed and withdrawn builds.
-- `POST /reserve`: takes `{channel, destination_feed_url, expected_revision, build, identity, feed_sha256, assets:[{name,sha256,url}], candidate_feed_sha256}`. It checks the revision and that the build is greater than all earlier reservations. It returns `{feed_sha256}`. A store accepts only its first channel and feed. A reservation is never removed.
-- `PUT /assets/<identity>/<filename>`: creates an asset. The service accepts repeated identical bytes. It refuses different bytes.
-- `POST /activate/<identity>`: makes the assets public.
-- `POST /commit/<identity>`: takes `{expected_feed_sha256, feed:<base64>}`. It replaces the feed and records the release in one atomic step. It refuses a feed hash that does not match.
-
-A failed precondition returns a non-2xx status and changes nothing. The service must not redirect. The publisher refuses redirects.
-
-## First update-enabled release
-
-Builds without the updater cannot find the first update-enabled release. Tell users to:
-
-1. Finish processing.
-2. Quit Underpressured.
-3. Open the DMG.
-4. Replace the app in Applications.
-5. Eject the DMG.
-6. Open the app.
-7. Check the version in About.
-8. Choose the automatic-update preference.
-
-Users keep their presets and preferences. Later releases install through **Check for Updates…**. Manual install is also the recovery path when the updater fails.
+`scripts/publish-release.py` and `scripts/publication-store.py` are an adapter for a possible self-hosted feed service. The GitHub release does not use them. Their docstrings and `scripts/test_publish_release.py` define the service contract.
 
 ## Update signing key
 
-Generate the key on a trusted Mac:
+Make the key on a trusted Mac. `generate_keys` is in the Sparkle `bin` folder.
 
 ```sh
 generate_keys --account underpressured-release
 ```
 
-The public key goes into the app configuration. The private key must never go into the repository, build output, CI logs, or shared folders.
+The public key goes into the app settings. Never put the private key in the repository, build output, CI logs, or shared folders.
 
-- Export a copy under `umask 077` with `generate_keys --account underpressured-release -x /secure/external/underpressured-ed25519.key`. Encrypt it at once.
-- Keep the key in an encrypted password manager or on encrypted offline storage. Only release maintainers get access.
-- Keep one encrypted backup in a different location. Keep the decryption material separate. Test the restore from time to time.
-- To restore, run `generate_keys --account underpressured-release -f <file>`. Then run `generate_keys --account underpressured-release -p` and compare with the published public key before you sign.
-- If all copies are lost or the key is compromised, do not silently use a new key. Plan a key rotation for installed apps and tell users first.
-
-`generate_keys` is in the Sparkle `bin` directory.
+- To export a copy, run `generate_keys --account underpressured-release -x /secure/external/underpressured-ed25519.key` with `umask 077`. Encrypt the copy immediately.
+- Keep the key in an encrypted password manager or on encrypted offline storage. Give access only to release maintainers.
+- Keep one encrypted backup in a different location. Keep the decryption material separate. Test the restore regularly.
+- To restore, run `generate_keys --account underpressured-release -f <file>`. Then run `generate_keys --account underpressured-release -p`. Before you sign, compare the output with the published public key.
+- If you lose all copies, or if the key is compromised, do not change to a new key without notice. Plan a key rotation for installed apps, and tell users first.
 
 ## Release build checks
 
-Record the commit, macOS version, language, reviewer, date, and result.
-All checks remain pending until a person records a result.
+Use the signed, notarized candidate from [Make a release candidate](#make-a-release-candidate). Record the commit, macOS version, language, reviewer, date, and result. All checks are pending until a person records a result.
 
-Use the signed, notarized candidate from the [release procedure](#make-a-release-candidate).
-
-- [ ] Check that a clean checkout passes hosted CI.
-- [ ] Review `App/AppIcon.icon` in the Dock.
-- [ ] Review notices in the signed archive before giving the acknowledgement attestation.
-- [ ] Check About's version, build, and notices link.
-- [ ] Install on a Mac that never ran Underpressured. Check Gatekeeper and `spctl -a -vv` acceptance.
-- [ ] Update version N to N+1. Check presets, names, preferences, language, consent, and relaunch.
-- [ ] Start an update during processing. Check that installation waits for idle. Repeat with new intake during the wait.
-- [ ] Check resumed installation and installation without relaunch. Check normal quit protection afterward.
-- [ ] Supply an update with an invalid signature. Check that the app refuses it.
-- [ ] Download published assets without credentials. Compare their bytes with `SHA256.json`.
+- [ ] A clean checkout passes hosted CI.
+- [ ] `App/AppIcon.icon` looks correct in the Dock.
+- [ ] The notices in the signed archive are correct. Do this before you give `--acknowledgements-reviewed`.
+- [ ] About shows the correct version, build, and notices link.
+- [ ] On a Mac that never ran Underpressured, Gatekeeper and `spctl -a -vv` accept the app.
+- [ ] An update from version N to N+1 keeps presets, names, preferences, language, and consent, and relaunches.
+- [ ] An update that starts during processing waits for idle. Do the check again with new intake during the wait.
+- [ ] A resumed installation and an installation without relaunch work. After them, the normal quit protection works.
+- [ ] The app refuses an update with a bad signature.
+- [ ] Published assets download without credentials, and their bytes match `SHA256.json`.
