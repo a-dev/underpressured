@@ -163,6 +163,70 @@ import MacPlatform
         }
     }
 
+    private func withFolder(_ body: (URL) throws -> Void) throws {
+        let parent = FileManager.default.temporaryDirectory.appendingPathComponent("up-SettingsStoreTests-\(UUID())")
+        try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: parent) }
+        try body(parent)
+    }
+
+    private func exportSettings(_ folder: URL) -> AppSettings {
+        var settings = AppSettings.initial
+        settings.destination = DestinationSettings(kind: .exportFolder, exportFolder: folder)
+        return settings
+    }
+
+    @Test func bookmarkFollowsAMovedExportFolderAndThePathKeyStaysForOlderBuilds() throws {
+        try withDefaults { defaults in
+            try withFolder { parent in
+                let original = parent.appendingPathComponent("Exports", isDirectory: true)
+                let moved = parent.appendingPathComponent("Renamed", isDirectory: true)
+                try FileManager.default.createDirectory(at: original, withIntermediateDirectories: false)
+                UserDefaultsSettingsStore(defaults: defaults).save(exportSettings(original))
+                #expect(defaults.data(forKey: "app.underpressured.destination.exportFolderBookmark") != nil)
+                #expect(defaults.string(forKey: "app.underpressured.destination.exportFolderPath") == original.path(percentEncoded: false))
+
+                try FileManager.default.moveItem(at: original, to: moved)
+                let store = UserDefaultsSettingsStore(defaults: defaults)
+                let loaded = try #require(store.load()?.destination.exportFolder)
+                #expect(loaded.resolvingSymlinksInPath().path == moved.resolvingSymlinksInPath().path)
+
+                store.save(exportSettings(loaded))
+                #expect(defaults.string(forKey: "app.underpressured.destination.exportFolderPath") == loaded.path(percentEncoded: false))
+            }
+        }
+    }
+
+    @Test func unresolvableBookmarkFallsBackToTheSavedPath() throws {
+        try withDefaults { defaults in
+            try withFolder { parent in
+                let folder = parent.appendingPathComponent("Gone", isDirectory: true)
+                try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false)
+                UserDefaultsSettingsStore(defaults: defaults).save(exportSettings(folder))
+                try FileManager.default.removeItem(at: folder)
+
+                let loaded = UserDefaultsSettingsStore(defaults: defaults).load()?.destination.exportFolder
+                #expect(loaded?.path(percentEncoded: false) == folder.path(percentEncoded: false))
+            }
+        }
+    }
+
+    @Test func aFolderThatCannotBeBookmarkedReplacesTheEarlierBookmark() throws {
+        try withDefaults { defaults in
+            try withFolder { parent in
+                let first = parent.appendingPathComponent("First", isDirectory: true)
+                try FileManager.default.createDirectory(at: first, withIntermediateDirectories: false)
+                let store = UserDefaultsSettingsStore(defaults: defaults)
+                store.save(exportSettings(first))
+                let missing = URL(filePath: "/no/such/\(UUID())", directoryHint: .isDirectory)
+                store.save(exportSettings(missing))
+
+                #expect(defaults.data(forKey: "app.underpressured.destination.exportFolderBookmark") == nil)
+                #expect(UserDefaultsSettingsStore(defaults: defaults).load()?.destination.exportFolder == missing)
+            }
+        }
+    }
+
     @Test func corruptPresetsFallBackToStartersAndKeepTheRest() {
         withDefaults { defaults in
             let store = UserDefaultsSettingsStore(defaults: defaults)

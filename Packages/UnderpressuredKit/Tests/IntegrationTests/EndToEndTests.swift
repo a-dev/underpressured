@@ -137,6 +137,7 @@ final class EndToEndTests {
     func expectNoHiddenFiles() {
         let hidden = relativePaths().filter { $0.split(separator: "/").contains { $0.hasPrefix(".") } }
         #expect(hidden.isEmpty, "leftover hidden files: \(hidden)")
+        #expect(files.pendingTemporaryFiles.isEmpty, "leftover temporary files: \(files.pendingTemporaryFiles)")
     }
 
     func expectOptimized(_ outcome: Outcome, notes: [Note] = []) -> Savings? {

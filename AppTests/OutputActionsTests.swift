@@ -197,7 +197,14 @@ enum NativeVisualEvidence {
         element.responds(to: NSSelectorFromString(name)) ? element.value(forKey: name) : nil
     }
 
+    /// SwiftUI builds its full AX tree only after an assistive client (for example VoiceOver) sets this on the app.
+    /// Without one, as in xcodebuild runs and hosted CI, NSHostingView exposes almost no children.
+    private static let assistiveClientActive: Void = {
+        NSApp.accessibilitySetValue(true, forAttribute: NSAccessibility.Attribute(rawValue: "AXEnhancedUserInterface"))
+    }()
+
     static func elements(_ root: NSObject, depth: Int = 0) -> [NSObject] {
+        _ = assistiveClientActive
         guard depth < 30 else { return [] }
         return [root] + (attribute(root, "accessibilityChildren") as? [NSObject] ?? []).flatMap {
             elements($0, depth: depth + 1)

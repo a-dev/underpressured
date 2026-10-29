@@ -44,7 +44,7 @@ public enum PresetStrings {
     public static let resizeRule = String(localized: "Resize Rule", bundle: .module, comment: "Preset field label")
     public static let outputFormat = String(localized: "Output Format", bundle: .module, comment: "Preset field label")
     public static let keepMetadata = String(localized: "Keep metadata", bundle: .module, comment: "Preset field label")
-    public static let qualityHelp = String(localized: "Higher keeps more detail; lower makes smaller files.", bundle: .module, comment: "Help text for preset quality")
+    public static let qualityHelp = String(localized: "Higher quality keeps more detail, while lower quality makes smaller files.", bundle: .module, comment: "Help text for preset quality")
     public static let losslessHelp = String(localized: "Images keep their original appearance. Resizing may change details. Saving as JPEG turns transparent areas white.", bundle: .module, comment: "Help text for lossless presets")
     public static let losslessQualityHelp = String(localized: "Quality is unused while Lossless is on.", bundle: .module, comment: "Help text for quality with lossless enabled")
     public static let keepMetadataHelp = String(localized: "Keeps EXIF, GPS and color profile data.", bundle: .module, comment: "Help text for metadata setting")

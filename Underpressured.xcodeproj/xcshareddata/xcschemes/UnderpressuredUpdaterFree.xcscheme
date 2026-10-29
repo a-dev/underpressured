@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A20000000000000000000041"
-               BuildableName = "UnderpressuredUpdaterFree.app"
+               BuildableName = "Underpressured.app"
                BlueprintName = "UnderpressuredUpdaterFree"
                ReferencedContainer = "container:Underpressured.xcodeproj">
             </BuildableReference>
@@ -38,7 +38,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A20000000000000000000041"
-            BuildableName = "UnderpressuredUpdaterFree.app"
+            BuildableName = "Underpressured.app"
             BlueprintName = "UnderpressuredUpdaterFree"
             ReferencedContainer = "container:Underpressured.xcodeproj">
          </BuildableReference>

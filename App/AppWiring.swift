@@ -22,6 +22,7 @@ enum AppWiring {
             settingsStore: UserDefaultsSettingsStore(),
             notifier: UserNotifier(),
             sleepPreventer: PowerAssertionSleepPreventer(),
-            isFrontmost: { NSApp.isActive })
+            isFrontmost: { NSApp.isActive },
+            folderAccess: FolderAccessPanel())
     }
 }

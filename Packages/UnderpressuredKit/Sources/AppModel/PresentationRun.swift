@@ -45,7 +45,7 @@ extension Presentation {
     static func savingsText(_ summary: RunSummary) -> String {
         guard summary.optimized > 0 else { return String(localized: "nothing optimized", bundle: .module, comment: "Run summary when no image was optimized.") }
         let savings = summary.savings
-        let percent = (Double(roundedPercent(savings)) / 100).formatted(.percent.precision(.fractionLength(0)))
+        let percent = percent(roundedPercent(savings))
         if savings.bytes < 0 {
             return String(localized: "\(size(-savings.bytes)) larger (\(percent))", bundle: .module, comment: "Run growth: formatted byte increase and formatted percentage including its percent sign.")
         }

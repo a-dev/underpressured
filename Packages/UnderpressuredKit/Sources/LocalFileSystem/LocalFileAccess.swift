@@ -7,11 +7,20 @@ import UniformTypeIdentifiers
 /// Implements `FileAccess` with FileManager and file-system APIs.
 public struct LocalFileAccess: FileAccess {
     private let trashOperation: @Sendable (URL) throws -> URL
+    private let temporaryFolders = TemporaryFolders()
 
     public init() { trashOperation = Self.foundationTrash }
 
     init(trashOperation: @escaping @Sendable (URL) throws -> URL) {
         self.trashOperation = trashOperation
+    }
+
+    /// Temporary files written by this instance that were not yet moved or removed.
+    /// Harnesses check this for leftovers, because temporary files live outside the target folders.
+    public var pendingTemporaryFiles: [URL] {
+        temporaryFolders.all.flatMap {
+            (try? FileManager.default.contentsOfDirectory(at: $0, includingPropertiesForKeys: nil)) ?? []
+        }
     }
 
     static func foundationTrash(_ url: URL) throws -> URL {
@@ -126,8 +135,20 @@ public struct LocalFileAccess: FileAccess {
             StoredOptimizationMark.attributeName, to: StoredOptimizationMark.encode(mark), at: url)
     }
 
+    /// Prefers the volume's item-replacement folder. Falls back to the target's folder when the volume has none.
     public func writeTemporaryFile(_ data: Data, near url: URL) throws(FileAccessError) -> URL {
         let name = ".\(url.lastPathComponent).\(UUID().uuidString).tmp"
+        // A second attempt replaces a reused folder that was removed since it was cached.
+        for attempt in 1...2 {
+            guard let folder = temporaryFolders.folder(near: url) else { break }
+            let temporary = folder.appendingPathComponent(name)
+            do throws(FileAccessError) {
+                try Self.perform { try data.write(to: temporary, options: .withoutOverwriting) }
+                return temporary
+            } catch .notFound where attempt == 1 {
+                temporaryFolders.forget(folder)
+            }
+        }
         let temporary = url.deletingLastPathComponent().appendingPathComponent(name)
         try Self.perform { try data.write(to: temporary, options: .withoutOverwriting) }
         return temporary

@@ -103,6 +103,9 @@ struct UnderpressuredApp: App {
                     NSWorkspace.shared.open(AppInfo.documentationURL)
                 }
                 .keyboardShortcut("?", modifiers: .command)
+                Button("Privacy Policy") {
+                    NSWorkspace.shared.open(AppInfo.privacyPolicyURL)
+                }
             }
             PresetUndoCommands(model: model)
             #if DIRECT_DISTRIBUTION

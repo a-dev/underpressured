@@ -58,6 +58,8 @@ public struct Item: Sendable, Hashable, Identifiable {
     public let droppedRoot: URL?
     /// Set when the scan already decided the Outcome (unsupported, already in the queue).
     public var state: ItemState
+    /// The accepted format intake classified, or nil. Processing inspects the file again.
+    public let scannedFormat: ImageFormat?
 
     public init(
         id: UUID = UUID(), source: URL, droppedRoot: URL?, state: ItemState = .waiting,
@@ -69,6 +71,7 @@ public struct Item: Sendable, Hashable, Identifiable {
             source: source, attributes: sourceAttributes, caseSensitive: sourceCaseSensitive)
         self.droppedRoot = droppedRoot
         self.state = state
+        if case .accepted(let format) = sourceAttributes?.contentType { scannedFormat = format } else { scannedFormat = nil }
     }
 }
 

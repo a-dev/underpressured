@@ -27,7 +27,7 @@ import UnderpressuredCore
         let s = summary(images: 128, optimized: 126, failed: 2, ignored: 14, original: 100_000_000, new: 38_000_000)
         let banner = Presentation.banner(s, filter: nil)
         let saved = Presentation.size(62_000_000)
-        #expect(banner.text == "128 images · \(saved) saved (62%) · 2 failed · 14 other files ignored")
+        #expect(banner.text == "128 images · \(saved) saved (\(Presentation.percent(62))) · 2 failed · 14 other files ignored")
         #expect(banner.filters.map(\.title) == ["2 failed"])
     }
 
@@ -48,7 +48,7 @@ import UnderpressuredCore
     @Test func growthReadsAsLarger() {
         let s = summary(images: 1, optimized: 1, original: 1_000_000, new: 1_180_000)
         let text = Presentation.banner(s, filter: nil).text
-        #expect(text == "1 image · \(Presentation.size(180_000)) larger (18%)")
+        #expect(text == "1 image · \(Presentation.size(180_000)) larger (\(Presentation.percent(18)))")
     }
 
     @Test func footerRunningAndIdle() {
@@ -56,7 +56,7 @@ import UnderpressuredCore
         s.finished = 37
         let running = Presentation.footer(s, isRunning: true)
         #expect(running.progressText == "37 / 128")
-        #expect(running.savingsText == "\(Presentation.size(500_000)) saved (50%)")
+        #expect(running.savingsText == "\(Presentation.size(500_000)) saved (\(Presentation.percent(50)))")
         let idle = Presentation.footer(s, isRunning: false)
         #expect(idle.progressText == nil)
         #expect(idle.savingsText == running.savingsText)

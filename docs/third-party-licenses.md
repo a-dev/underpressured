@@ -1,10 +1,8 @@
 # Third-party licenses
 
-[Resources/Acknowledgements.txt](../Resources/Acknowledgements.txt) contains the bundled project license and third-party notices.
-The About window links to this content. The project uses the [MIT license](../LICENSE).
+The project uses the [MIT license](../LICENSE). [Resources/Acknowledgements.txt](../Resources/Acknowledgements.txt) has the project license and the third-party notices that ship in the app. The About window links to it.
 
-Update this inventory and the bundled texts when dependency pins or the linked dependency graph change.
-The verifier checks exact copies against local source files without network access.
+When a dependency pin or the linked dependencies change, update this file and `Acknowledgements.txt`. Then run the [offline verification](#offline-verification).
 
 ## Linked components
 
@@ -14,14 +12,11 @@ The verifier checks exact copies against local source files without network acce
 | jpegli | `scripts/build-deps.sh`, commit `031a0077f5799a6041004267fc12b956c1f52a20` | jpegli BSD 3-Clause, Highway license with Apache/BSD/CC0 texts, and Little CMS MIT |
 | Rust codecs | `rust/up-codecs/Cargo.lock` for `aarch64-apple-darwin` | Exact source licenses listed below and vendored libdeflate MIT |
 
-Sparkle's pinned package declares binary artifact SHA-256 `17e28312b8e18ab7cdbbe09a6fb28cc55a5479ec6c371dbc07cdecd2a14fd959`.
-Its framework and helpers come from that artifact.
-The full Sparkle license retains notices for bsdiff, sais-lite, Ed25519, and `SUSignatureVerifier.m`.
+The pinned Sparkle package declares the binary artifact SHA-256 `17e28312b8e18ab7cdbbe09a6fb28cc55a5479ec6c371dbc07cdecd2a14fd959`. The Sparkle framework and helpers come from that artifact. The full Sparkle license keeps the notices for bsdiff, sais-lite, Ed25519, and `SUSignatureVerifier.m`.
 
 ## Rust dependencies
 
-This table lists normal macOS dependencies. It excludes build-only tools such as cbindgen.
-For dual-licensed crates, the bundle uses the exact MIT text from the source.
+The table lists the normal macOS dependencies. It does not list build-only tools, such as cbindgen. For crates with more than one license, the app ships the exact MIT text from the source.
 
 | Crate | Version | Cargo license expression | Bundled source license path |
 | --- | --- | --- | --- |
@@ -47,21 +42,19 @@ For dual-licensed crates, the bundle uses the exact MIT text from the source.
 | `rustc-hash` | `2.1.3` | `Apache-2.0 OR MIT` | `LICENSE-MIT` |
 | `simd-adler32` | `0.3.10` | `MIT` | `LICENSE.md` |
 
-Paths are relative to each crate's source directory in Cargo's registry cache.
-The verifier reads those paths from offline Cargo metadata.
-`libdeflate-sys` also links vendored C code with its own MIT license at `libdeflate/COPYING`.
-The bundle includes that text and the wrapper's Apache-2.0 license.
+Paths are relative to each crate's source folder in the Cargo registry cache. The verifier reads them from offline Cargo metadata.
+
+`libdeflate-sys` also links vendored C code with its own MIT license at `libdeflate/COPYING`. The app ships that text and the Apache-2.0 license of the wrapper.
 
 ## Distribution checks
 
-Keep upstream license texts, copyright notices, conditions, disclaimers, and applicable external notices in the acknowledgements.
-Keep applicable Apache NOTICE material. The project MIT license does not replace dependency notices.
-Review the exact signed archive, including frameworks, helpers, and acknowledgements, before distribution.
-The text-copy check does not replace that review.
+- Keep the upstream license texts, copyright notices, conditions, disclaimers, and external notices that apply.
+- Keep the Apache NOTICE text that applies. The project MIT license does not replace dependency notices.
+- Before distribution, a person must examine the signed archive, including frameworks, helpers, and acknowledgements. The text-copy check does not replace this review.
 
 ## Offline verification
 
-Resolve dependencies locally. Run:
+Resolve the dependencies locally, then run:
 
 ```sh
 scripts/verify-acknowledgements.py \
@@ -71,9 +64,8 @@ scripts/verify-acknowledgements.py \
   --check-sparkle-framework
 ```
 
-The command checks source pins, the Cargo dependency set, exact license copies, and the app's acknowledgements resource.
-It also requires Sparkle.framework and Sparkle's external notices.
-Keep the resolved Sparkle and jpegli source directories available for repeat checks.
+The command uses no network. It checks the source pins, the Cargo dependencies, the exact license copies, and the acknowledgements in the app. It also requires Sparkle.framework and the Sparkle external notices. Keep the resolved Sparkle and jpegli source folders, so you can run the check again.
 
-For the updater-free app, omit Sparkle options. Use `--skip-sparkle-check` and that app's `--app-bundle` path.
-A missing Sparkle checkout prevents a complete direct-distribution check. Report skipped checks as partial results.
+For the updater-free app, remove the Sparkle options. Use `--skip-sparkle-check` and the `--app-bundle` path of that app.
+
+Without a Sparkle checkout, the direct-distribution check is not complete. Report a skipped check as a partial result.

@@ -60,9 +60,6 @@ JPEG output flattens transparency onto white. The app keeps the color profile, c
 All image processing happens on your Mac, and the app collects no analytics.
 
 The app checks for updates only after you agree to automatic checks, or when you choose Check for Updates… yourself. Update checks read a feed on GitHub Pages (`a-dev.github.io`) and download from GitHub Releases. The app never installs an update without asking you. If images are processing, it waits until the queue is idle, including after a cancellation, before it installs and restarts.
-
-Builds released before the updater can't find updates on their own. To move to the first update-enabled release, finish processing, quit the app, replace it in Applications with the copy from the DMG, and open it again. Your presets and preferences stay. [Release](docs/release.md#first-update-enabled-release) lists the full steps.
-
 ## Languages
 
 The app is available in English, Spanish, Brazilian Portuguese, German, French, Arabic, Japanese, and Simplified Chinese. It follows the macOS language setting and falls back to English. AI tools drafted the translations, and native speakers haven't reviewed them yet.

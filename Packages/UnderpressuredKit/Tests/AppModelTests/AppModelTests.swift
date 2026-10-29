@@ -62,7 +62,7 @@ func makeModel(
 
         #expect(!model.isRunning)
         #expect(model.rows.map(\.name) == ["a.jpg", "b.png"])
-        #expect(model.rows.allSatisfy { $0.stateText == "Optimized" && $0.savingsText == "-60%" })
+        #expect(model.rows.allSatisfy { $0.stateText == "Optimized" && $0.savingsText == Presentation.percent(-60, signed: true) })
         let banner = model.banner?.text ?? ""
         #expect(banner.hasPrefix("2 images · "))
         #expect(banner.hasSuffix(" · 3 other files ignored"))

@@ -28,6 +28,8 @@ public final class ProcessingSession {
         case runStarted
         case activity(Activity)
         case scanFailures([ScanFailure])
+        /// The user granted the captured Export folder, so a saved bookmark can now include access.
+        case exportFolderGranted
         case queue(QueueEvent)
     }
 
@@ -41,6 +43,7 @@ public final class ProcessingSession {
 
     private let queue: Queue
     private let intake: Intake
+    private let folderAccess: any FolderAccess
     private var generation = 0
     private var requests: [Int: Task<Void, Never>] = [:]
     private var tail: Task<Void, Never>?
@@ -52,9 +55,10 @@ public final class ProcessingSession {
     private var idleWaiters: [CheckedContinuation<Void, Never>] = []
     private var eventTask: Task<Void, Never>?
 
-    public init(queue: Queue, intake: @escaping Intake) {
+    public init(queue: Queue, intake: @escaping Intake, folderAccess: any FolderAccess = UnrestrictedFolderAccess()) {
         self.queue = queue
         self.intake = intake
+        self.folderAccess = folderAccess
         let events = queue.events
         eventTask = Task { [weak self] in
             for await event in events {
@@ -67,6 +71,8 @@ public final class ProcessingSession {
     isolated deinit { eventTask?.cancel() }
 
     /// Captures settings after admission is unlocked and before scanning starts.
+    /// Before scanning, asks for an Export folder the app cannot write.
+    /// Between scan and admission, asks for folders that converted loose files need.
     public func open(_ urls: [URL], capture: @MainActor () -> Capture?) async {
         let admissionGeneration = generation
         while idleOperation != nil {
@@ -88,6 +94,11 @@ public final class ProcessingSession {
             await previous?.value
             guard scanGeneration == generation, !Task.isCancelled else { return }
             let exportFolder: URL? = if case .exportFolder(let url) = captured.destination { url } else { nil }
+            if let exportFolder, !folderAccess.canCreateFiles(in: exportFolder) {
+                await folderAccess.requestAccess(to: exportFolder, for: .exportFolder)
+                guard scanGeneration == generation, !Task.isCancelled else { return }
+                if folderAccess.canCreateFiles(in: exportFolder) { onEvent?(.exportFolderGranted) }
+            }
             let intake = intake
             // The scanner blocks on filesystem calls, so it runs outside the cooperative pool.
             let result = await withCheckedContinuation { continuation in
@@ -96,6 +107,13 @@ public final class ProcessingSession {
                 }
             }
             guard scanGeneration == generation, !Task.isCancelled else { return }
+            let folders = SiblingOutputFolders.needed(
+                for: result.items, outputFormat: captured.outputFormat, destination: captured.destination)
+            // Checked per folder: granting one folder can cover the next.
+            for folder in folders where !folderAccess.canCreateFiles(in: folder) {
+                await folderAccess.requestAccess(to: folder, for: .siblingOutputs)
+                guard scanGeneration == generation, !Task.isCancelled else { return }
+            }
             onEvent?(.scanFailures(result.failures))
             let batch = Batch(activePreset: captured.preset, outputFormat: captured.outputFormat,
                               destination: captured.destination, items: result.items, ignoredCount: result.ignoredCount)

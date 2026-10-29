@@ -129,11 +129,13 @@ public final class AppModel {
         sleepPreventer: any SleepPreventer = NoSleepPreventer(),
         isFrontmost: @escaping @MainActor () -> Bool = { true },
         fileExists: @escaping (URL) -> Bool = { FileManager.default.fileExists(atPath: $0.path) },
+        folderAccess: any FolderAccess = UnrestrictedFolderAccess(),
         updateInterval: Duration = .milliseconds(100)
     ) {
         self.init(queue: queue, intake: intake, settingsStore: settingsStore,
                   notifier: notifier, sleepPreventer: sleepPreventer, isFrontmost: isFrontmost,
-                  fileExists: fileExists, updateInterval: updateInterval, progressTime: ContinuousProgressTime())
+                  fileExists: fileExists, folderAccess: folderAccess, updateInterval: updateInterval,
+                  progressTime: ContinuousProgressTime())
     }
 
     init(
@@ -143,11 +145,12 @@ public final class AppModel {
         sleepPreventer: any SleepPreventer = NoSleepPreventer(),
         isFrontmost: @escaping @MainActor () -> Bool = { true },
         fileExists: @escaping (URL) -> Bool = { FileManager.default.fileExists(atPath: $0.path) },
+        folderAccess: any FolderAccess = UnrestrictedFolderAccess(),
         updateInterval: Duration = .milliseconds(100),
         progressTime: any ProgressTime
     ) {
         pending = PendingEvents(time: progressTime)
-        session = ProcessingSession(queue: queue, intake: intake)
+        session = ProcessingSession(queue: queue, intake: intake, folderAccess: folderAccess)
         self.settingsStore = settingsStore
         self.notifier = notifier
         self.sleepPreventer = sleepPreventer
@@ -170,6 +173,8 @@ public final class AppModel {
                 for failure in failures where known.insert(failure).inserted {
                     self.intakeFailures.append(failure)
                 }
+            case .exportFolderGranted:
+                self.settingsChanged()
             case .activity(let activity):
                 // Completion must see all terminal queue events, regardless of the UI throttle.
                 if !activity.isRunning { self.applyPending() }

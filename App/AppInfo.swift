@@ -2,6 +2,7 @@ import Foundation
 
 enum AppInfo {
     static let documentationURL = URL(string: "https://underpressured.app")!
+    static let privacyPolicyURL = URL(string: "https://underpressured.app/privacy/")!
 
     static let supportEmail = "support@underpressured.app"
     static let supportURL = URL(string: "mailto:\(supportEmail)")!

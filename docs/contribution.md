@@ -1,48 +1,33 @@
 # Contributing
 
-This guide is for people who want to build Underpressured, change its code, or improve its translations. The [README](../README.md) describes the app for users.
+This guide is for people who build Underpressured, change its code, or improve its translations. The [README](../README.md) describes the app for users.
 
-## Build from source
+## Build and test
 
-You need an Apple Silicon Mac with macOS 27 or later, Xcode 27, CMake, Ninja, and Rust with Cargo. Run these commands from the repository root:
+Follow [Build the app](development.md#build-the-app). Before you send a pull request, run `scripts/test.sh`. CI runs the same script.
 
-```sh
-scripts/build-deps.sh
-open Underpressured.xcodeproj
-```
+## Change the code
 
-Then run the `Underpressured` scheme in Xcode. The first dependency build fetches pinned sources, and later builds reuse them when the inputs have not changed.
+Read the [architecture](architecture.md) and the [glossary](GLOSSARY.md) first. Then follow the [change workflow](development.md#change-workflow).
 
-## Run the tests
+## Commits and pull requests
 
-`scripts/test.sh` runs the full suite, the same one CI runs:
+Write commit messages in the [Conventional Commits](https://www.conventionalcommits.org/) format: `type(scope): summary`.
 
-```sh
-scripts/test.sh
-```
+- Use the type `feat` for a new feature, `fix` for a bug fix, `docs` for documentation, and `chore` for other work.
+- The scope is optional. For example, use `sandbox`, `ci`, or `test`.
+- Add `!` after the type or scope for a breaking change, for example `feat!:`.
 
-[Build and test](development.md) covers focused test commands, performance checks, CI, and the manual interaction checks.
+A release commit changes only `Config/Version.xcconfig` and `CHANGELOG.md`. Use the message `chore(release): <VERSION> (build <BUILD>)`, for example `chore(release): 1.1.0 (build 2)`. Make it the last commit before the release tag `<VERSION>-<BUILD>`. See [Release](release.md).
 
-## Before you change the code
+Merge a pull request with a merge commit. Keep the default message from GitHub. If you squash a pull request, give it a title in the Conventional Commits format. GitHub uses that title as the commit message.
 
-Read the [architecture guide](architecture.md) and the [glossary](GLOSSARY.md) first. When a change alters app behavior, a product term, or which module owns something, update [App behavior](SPEC.md), the glossary, and the architecture guide in the same change. The [change workflow](development.md#change-workflow) lists the steps.
+Add the `full-ci` label to a release pull request. For a pull request without this label, CI runs only the fast tests.
 
 ## Translations
 
-AI tools drafted the Spanish, Brazilian Portuguese, German, French, Arabic, Japanese, and Simplified Chinese translations, and no native speaker has reviewed them yet. The [translation guide](translations.md) explains where the strings live, which terms to keep, and how to send a correction. You can also [offer a translation review](https://github.com/a-dev/underpressured/issues/new?title=Translation%20contribution) as a GitHub issue.
+AI tools wrote all seven translations. No native speaker reviewed them yet. The [translation guide](translations.md) tells you how to send a correction.
 
 ## Report a problem
 
-[Open an issue](https://github.com/a-dev/underpressured/issues) on GitHub or email [support@underpressured.app](mailto:support@underpressured.app).
-
-## Reference
-
-- [Documentation index](README.md)
-- [App behavior](SPEC.md)
-- [Architecture and source map](architecture.md)
-- [Glossary](GLOSSARY.md)
-- [Build and test](development.md)
-- [Release](release.md), including signing, notarization, and the [release build checks](release.md#release-build-checks)
-- [Translations](translations.md)
-- [Third-party licenses](third-party-licenses.md)
-- [Codec benchmarks](../bench/README.md)
+[Open an issue](https://github.com/a-dev/underpressured/issues) or email [support@underpressured.app](mailto:support@underpressured.app).

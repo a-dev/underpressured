@@ -3404,37 +3404,37 @@
         }
       }
     },
-    "Higher keeps more detail; lower makes smaller files." : {
+    "Higher quality keeps more detail, while lower quality makes smaller files." : {
       "comment" : "Help text for preset quality",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "القيمة الأعلى تحتفظ بتفاصيل أكثر؛ والقيمة الأقل تنتج ملفات أصغر."
+            "value" : "الجودة الأعلى تحتفظ بتفاصيل أكثر، بينما تنتج الجودة الأقل ملفات أصغر."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Höhere Werte erhalten mehr Details; niedrigere ergeben kleinere Dateien."
+            "value" : "Höhere Qualität erhält mehr Details, während niedrigere Qualität kleinere Dateien ergibt."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Higher keeps more detail; lower makes smaller files."
+            "value" : "Higher quality keeps more detail, while lower quality makes smaller files."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un valor más alto conserva más detalles; uno más bajo crea archivos más pequeños."
+            "value" : "Una calidad más alta conserva más detalles, mientras que una más baja crea archivos más pequeños."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Une valeur élevée conserve plus de détails ; une valeur faible produit des fichiers plus légers."
+            "value" : "Une qualité élevée conserve plus de détails, tandis qu’une qualité plus faible produit des fichiers plus légers."
           }
         },
         "ja" : {
@@ -3446,13 +3446,13 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Valores mais altos mantêm mais detalhes; valores mais baixos geram arquivos menores."
+            "value" : "Uma qualidade mais alta mantém mais detalhes, enquanto uma mais baixa gera arquivos menores."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "数值越高保留的细节越多；数值越低，文件越小。"
+            "value" : "质量越高，保留的细节越多，而质量越低，文件越小。"
           }
         }
       }

@@ -48,7 +48,7 @@ import UnderpressuredCore
         #expect(r.stateText == "Optimized")
         #expect(r.issueText == nil)
         #expect(r.sizesText == "\(Presentation.size(4_000_000)) → \(Presentation.size(1_000_000))")
-        #expect(r.savingsText == "-75%")
+        #expect(r.savingsText == Presentation.percent(-75, signed: true))
         #expect(!r.isGrowth)
         #expect(r.isReduction)
         #expect(r.detail == nil)
@@ -56,7 +56,7 @@ import UnderpressuredCore
 
     @Test func negativeSavingsShowAsGrowth() {
         let r = row(.optimized(Savings(originalBytes: 1_000, newBytes: 1_180), notes: [], output: URL(filePath: "/out")))
-        #expect(r.savingsText == "+18%")
+        #expect(r.savingsText == Presentation.percent(18, signed: true))
         #expect(r.isGrowth)
         #expect(!r.isReduction)
     }
@@ -80,11 +80,11 @@ import UnderpressuredCore
 
     @Test func tinyChangesRoundToZeroWithoutASign() {
         let grew = row(.optimized(Savings(originalBytes: 10_000, newBytes: 10_001), notes: [], output: URL(filePath: "/out")))
-        #expect(grew.savingsText == "0%")
+        #expect(grew.savingsText == Presentation.percent(0))
         #expect(!grew.isGrowth)
         #expect(!grew.isReduction)
         let saved = row(.optimized(Savings(originalBytes: 10_000, newBytes: 9_999), notes: [], output: URL(filePath: "/out")))
-        #expect(saved.savingsText == "0%")
+        #expect(saved.savingsText == Presentation.percent(0))
         #expect(!saved.isReduction)
     }
 

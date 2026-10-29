@@ -47,9 +47,13 @@ public protocol SleepPreventer: AnyObject {
 @MainActor
 public final class InMemorySettingsStore: SettingsStore {
     public private(set) var saved: AppSettings?
+    public private(set) var saveCount = 0
     public init(_ saved: AppSettings? = nil) { self.saved = saved }
     public func load() -> AppSettings? { saved }
-    public func save(_ settings: AppSettings) { saved = settings }
+    public func save(_ settings: AppSettings) {
+        saved = settings
+        saveCount += 1
+    }
 }
 
 @MainActor

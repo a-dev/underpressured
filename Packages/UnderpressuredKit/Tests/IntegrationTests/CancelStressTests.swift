@@ -178,9 +178,9 @@ final class CancelStressTests {
         return try #require(enumerator.allObjects as? [URL])
     }
 
-    /// `LocalFileAccess` names temporary files `.<name>.<UUID>.tmp`.
+    /// `LocalFileAccess` names temporary files `.<name>.<UUID>.tmp`, normally outside the fixture tree.
     private func leftovers(in folder: URL) throws -> [URL] {
-        try allFiles(in: folder).filter { $0.pathExtension == "tmp" }
+        try allFiles(in: folder).filter { $0.pathExtension == "tmp" } + files.pendingTemporaryFiles
     }
 
     private func visibleImages(in folder: URL) throws -> [URL] {

@@ -8,6 +8,8 @@ See [Build and test](../../../docs/development.md#run-tests) for commands and su
 | Preset undo at every initialized position and active-last fallback: exact values, IDs, order, later explicit activation, and persistence after undo/redo | `AppModelTests/PresetUndoTests.swift` |
 | Preset names: explicit 70-character contract, literal 69/70/71 grapheme boundaries, capped duplicate suffixes, and unchanged saved names of lengths 21–70 | `UnderpressuredCoreTests/PresetTests.swift`, `PresetListTests.swift`, `MacPlatformTests/SettingsStoreTests.swift` |
 | Intake and format resolution | `UnderpressuredApplicationTests/ScannerTests.swift`, `UnderpressuredCoreTests/OutputFormatTests.swift` |
+| Folder access for conversions beside loose files: one request per unwritable folder before admission, none for dropped folders, a writable Export folder, same format or decided Items; refusal still admits; cancellation discards; an unwritable Export folder is requested before admission and a grant is reported | `UnderpressuredApplicationTests/FolderAccessIntakeTests.swift` |
+| A granted Export folder saves the settings again so the bookmark can be rebuilt | `AppModelTests/DestinationMenuTests.swift` |
 | Paths, marks, and size decisions | `UnderpressuredApplicationTests/OutputPathPlannerTests.swift`, `UnderpressuredCoreTests/OptimizationMarkTests.swift`, `NotSmallerRuleTests.swift`, `LocalFileSystemTests/StoredOptimizationMarkTests.swift` |
 | Converted-output commit failure: both cleanup preferences preserve original bytes, never attempt source cleanup, remove temporary output; successful conversion/cleanup-error behavior retained | `UnderpressuredApplicationTests/PipelineTests.swift` |
 | Linear scheduler transition budget, once-only completion, terminal retirement and planner release | `UnderpressuredApplicationTests/ExecutionRetentionTests.swift` |
@@ -47,6 +49,8 @@ Cancellation stress pins fixture dates to whole seconds and replays delay choice
 | Intake cancellation and exclusive idle handoff | `UnderpressuredApplicationTests/ProcessingSessionTests.swift`, `AppModelTests/IdleOperationTests.swift`, `QuitTests.swift`, `AppTests/UpdateInstallationTests.swift` |
 | Reservation lifetime and bounded execution | `UnderpressuredApplicationTests/RunReservationTests.swift`, `ExecutionRetentionTests.swift`, `PixelBudgetTests.swift` |
 | Committed output survives cancellation and source-cleanup failure | `UnderpressuredApplicationTests/WriteFailureCancellationTests.swift`, `PipelineTests.swift`, `LocalFileSystemTests/LocalFileAccessWriteTests.swift` |
+| Temporary files on the target volume outside the target folder, reuse, replacement of a removed folder, and leftover checks | `LocalFileSystemTests/LocalFileAccessWriteTests.swift`, `CancelIntegrationTests.swift`, `IntegrationTests/CancelStressTests.swift`, `EndToEndTests.swift` |
+| Export-folder bookmark: moved folder, path fallback, legacy path key | `MacPlatformTests/SettingsStoreTests.swift` |
 | Stored settings and mark compatibility | `MacPlatformTests/PresetStorageTests.swift`, `SettingsStoreTests.swift`, `LocalFileSystemTests/StoredOptimizationMarkTests.swift` |
 | Target dependencies, imports, and source ownership | `scripts/check-architecture.py`, `scripts/test_check_architecture.py` |
 

@@ -35,7 +35,7 @@ struct T7CommitPresentationTests {
         #expect(model.rows.count == 1)
         #expect(model.rows[0].stateText == "Optimized")
         #expect(model.rows[0].openURL == output)
-        #expect(model.banner?.text == "1 image · 600 bytes saved (60%)")
+        #expect(model.banner?.text == "1 image · 600 bytes saved (\(Presentation.percent(60)))")
         #expect(model.banner?.filters.isEmpty == true)
     }
 }

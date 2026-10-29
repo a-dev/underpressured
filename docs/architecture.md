@@ -1,31 +1,36 @@
 # Architecture
 
-Underpressured has one Image Optimization domain. Presets and processing share this model.
-Domain types enforce product rules. Application services coordinate work through ports. Platform adapters implement those ports.
-Presentation owns UI state, localized text, focus, and undo.
+Underpressured has one domain: Image Optimization. Presets and processing use the same model. There are four layers:
 
-## Modules and source locations
+- Domain types (Core) enforce the product rules.
+- Application services control the work through ports.
+- Platform adapters implement the ports.
+- Presentation (AppModel) owns UI state, localized text, focus, and undo.
 
-Package paths below are relative to `Packages/UnderpressuredKit/Sources/`.
+## Modules
 
-| Location                                            | Owner and responsibility                                                                                          |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `UnderpressuredCore/`                               | Presets, constrained values, captured batch settings, source facts, outcomes, format decisions, and mark matching |
-| `UnderpressuredApplication/ProcessingSession.swift` | Intake order, pending scans, cancellation generations, Run activity, and exclusive idle operations                |
-| `UnderpressuredApplication/Queue/`                  | Atomic admission, source exclusion, execution records, worker cancellation, and pixel accounting                  |
-| `UnderpressuredApplication/Pipeline/`               | Processing stages and file-commit sequencing                                                                      |
-| `UnderpressuredApplication/Rules/`                  | Folder scanning and output-path planning                                                                          |
-| `UnderpressuredApplication/Boundaries/`             | File and codec ports                                                                                              |
-| `AppModel/`                                         | Observable projections, preset interactions, selection, localization, and undo                                    |
-| `LocalFileSystem/`                                  | File operations, OS content classification, and optimization-mark serialization                                   |
-| `ImageEngine/`                                      | ImageIO transforms, native codec wrappers, JPEG rewriting, and PNG palette search                                 |
-| `MacPlatform/`                                      | Saved-settings mappings, notifications, sleep prevention, and processor probes                                    |
-| `SoakHarness/`                                      | Executable for soak and performance scripts                                                                       |
+Package paths are relative to `Packages/UnderpressuredKit/Sources/`.
 
-`App/` contains SwiftUI views, AppKit integration, dialogs, and Quick Look.
-`App/AppWiring.swift` constructs the model, services, and adapters.
-`native/up-jpegli/` and `rust/up-codecs/` provide C interfaces to the native codecs.
-`Vendor/` contains generated XCFrameworks and is excluded from Git.
+| Location | Owns |
+| --- | --- |
+| `UnderpressuredCore/` | Presets, value limits, captured batch settings, source facts, outcomes, format decisions, and mark matching |
+| `UnderpressuredApplication/ProcessingSession.swift` | Intake order, pending scans, folder-access requests, cancellation generations, Run activity, and idle operations |
+| `UnderpressuredApplication/Queue/` | Atomic admission, source exclusion, execution records, worker cancellation, and the pixel budget |
+| `UnderpressuredApplication/Pipeline/` | Processing stages and the file-commit sequence |
+| `UnderpressuredApplication/Rules/` | Folder scan, output-path plan, and the folders that a conversion next to a loose file needs |
+| `UnderpressuredApplication/Boundaries/` | File, codec, and folder-access ports |
+| `AppModel/` | Observable UI state, preset interactions, selection, localization, and undo |
+| `LocalFileSystem/` | File operations, content type detection, and optimization-mark storage |
+| `ImageEngine/` | ImageIO transforms, native codec wrappers, JPEG rewrite, and PNG palette search |
+| `MacPlatform/` | Saved settings, notifications, sleep prevention, and processor detection |
+| `SoakHarness/` | Executable for the soak and performance scripts |
+
+Other locations:
+
+- `App/` has the SwiftUI views, AppKit integration, dialogs, the folder-access panel, and Quick Look.
+- `App/AppWiring.swift` makes the model, the services, and the adapters, and connects them.
+- `native/up-jpegli/` and `rust/up-codecs/` give C interfaces to the native codecs.
+- `Vendor/` has the generated XCFrameworks. Git ignores it.
 
 ## Dependency rules
 
@@ -42,89 +47,85 @@ flowchart TD
     Application --> Core
 ```
 
-Arrows mean imports. ImageEngine also imports the native codec targets.
-Core can use Foundation values such as `URL`, `UUID`, `Date`, and `Data`.
-Core must not access files, UserDefaults, system probes, codec implementations, or task scheduling.
-Application code defines ports and platform-service contracts. Adapters must not import AppModel.
-Presentation supplies localized notification and sleep-prevention text through application contracts.
+An arrow means "imports". ImageEngine also imports the native codec targets.
 
-`scripts/check-architecture.py` checks target dependencies, source locations, and imports.
-Review public APIs and effects as well. Import checks cannot prove correct ownership.
+- Core can use Foundation values, such as `URL`, `UUID`, `Date`, and `Data`.
+- Core must not use files, UserDefaults, system probes, codec code, or task scheduling.
+- Application defines the ports and the platform-service contracts.
+- Adapters must not import AppModel.
+- Presentation gives the localized notification and sleep-prevention text to Application through its contracts.
 
-## Product rules and execution ownership
+`scripts/check-architecture.py` checks target dependencies, source locations, and imports. Import checks cannot prove correct ownership, so also review public APIs and effects.
 
-`PresetList` owns membership, order, and one active member. It contains 1 to 20 presets with distinct IDs.
-Names contain 1 to 70 Unicode grapheme clusters. Quality is 0 to 100. Resize limits are positive.
-Construction, restoration, and public mutations preserve these rules. Duplicate names are valid.
+## Ownership rules
 
-Each batch captures its preset label, settings, output format, identity, and destination before scanning.
-Later preset edits cannot change that capture.
-Item source facts are immutable. Mutable batch items and row states are consumer-owned values.
-Queue owns the authoritative execution records and terminal transitions.
-
-Queue rejects duplicate candidate item IDs and active batch or item ID collisions before events or source reservations.
-IDs can be reused after execution records retire.
-Source exclusion recognizes normalized paths and underlying files, including hard links.
-Each item receives one terminal outcome.
+- `PresetList` owns the members, their order, and the one active member. Construction, restoration from storage, and each public mutation keep the [preset limits](SPEC.md#values).
+- Each batch captures its preset settings and destination before the scan. Later preset edits do not change the capture.
+- Item source facts never change. Batch items and row states that change are values that each consumer owns.
+- Queue owns the authoritative execution records and the final state change of each item.
+- Before Queue sends events or reserves sources, it rejects a batch with duplicate item IDs, or with batch or item IDs that active execution uses. An ID can be used again after its execution record retires.
+- Source exclusion recognizes normalized paths and the underlying file, including hard links.
+- Each item gets exactly one outcome.
 
 ## Run and queue lifetimes
 
-A product Run starts with valid, nonempty intake from idle.
-It ends when pending scans, admissions, and unfinished items settle.
-A temporary queue drain does not end a Run while intake remains pending.
-Run totals drive progress and background completion notifications. The completion banner summarizes retained history across Runs.
+A [Run](GLOSSARY.md#processing) and a queue execution interval are different lifetimes. Do not mix their identities. A Run includes pending intake, so an empty queue does not end a Run while a scan is pending. ProcessingSession tracks the Run.
 
-A queue execution interval starts at admission and ends when admitted work drains.
-`QueueExecutionContext` owns output reservations and folder checks for that interval.
-Active workers retain the context through cancellation until they return.
-Batch captures and presentation events contain no execution context.
-
-Later intervals use fresh reservations and can refresh a valid marked export, including within the same Run.
-Existing files protect paths between intervals. See [destination rules](SPEC.md#6-destination).
+- `QueueExecutionContext` owns the output reservations and the folder checks for one interval.
+- Active workers keep the context until they return, also after a cancellation.
+- Batch captures and presentation events do not contain the context.
+- A later interval gets new reservations. It can replace a valid marked export, also in the same Run. Between intervals, existing files protect the paths. See the [destination rules](SPEC.md#5-destination).
 
 ## Processing flow
 
-1. AppModel forwards Open, drops, and Open With to ProcessingSession.
-2. ProcessingSession captures settings and scans outside the main actor in intake order.
+1. AppModel sends Open, drops, and Open With to ProcessingSession.
+2. ProcessingSession captures the settings. It scans outside the main actor, in intake order.
 3. Queue admits batches and schedules items.
 4. Pipeline checks marks, inspects pixels, reserves memory, transforms, encodes, and commits through FileAccess.
-5. ProcessingSession consumes queue events without the UI throttle and forwards immutable events to AppModel.
+5. ProcessingSession receives queue events without the UI throttle. It sends events that never change to AppModel.
 
-ProcessingSession owns cancellation generations and rejects late scan results after cancellation.
-Exclusive idle reservations lock intake synchronously and remain held until explicit release.
-Quit and update installation use this same coordinator.
+Coordination:
 
-AppModel coalesces row updates at 100 ms intervals. The first event and queue idle flush immediately.
-Run completion flushes terminal rows before presentation creates a summary or notification.
+- ProcessingSession owns cancellation generations. It ignores scan results that arrive after a cancellation.
+- An exclusive idle reservation locks intake at once. It stays until an explicit release. Quit and update installation use this reservation.
+- AppModel combines row updates into 100 ms intervals. The first event and queue idle apply immediately. At the end of a Run, the final rows apply before the summary or notification.
 
-Parallelism uses the performance-core count, with the active processor count as fallback.
-The default pixel budget is 120 megapixels. Pixel reservations use FIFO order. An image above the budget runs alone.
-Codec work runs outside the caller's task. Cancellation stops processing between stages.
-Native failures use an ImageIO fallback only when it meets the requested fidelity contract.
+Resources:
 
-## Files and storage
+- Parallel work uses the performance-core count. If that is not available, it uses the active processor count.
+- The default pixel budget is 120 megapixels. Pixel reservations are first in, first out. An image larger than the budget processes alone.
+- Codec work runs outside the caller's task. Cancellation stops processing between stages.
+- If a native codec fails, ImageIO is used only if it meets the requested fidelity.
 
-Temporary files use the destination volume. Commit rechecks source identity, size, and modification date.
-Marked replacement also requires the expected destination version.
-Each file commits independently. Cancellation and later source-cleanup failures cannot remove a committed output.
+## Files
 
-MacPlatform maps versioned settings into valid domain values. LocalFileSystem owns versioned JSON and optimization-mark extended attributes.
-Application commit tokens retain opaque expected mark bytes.
-Preserve stored keys, preset IDs, order, starter identifiers, legacy defaults, and compatible mark payloads.
-Batch and item execution state does not persist.
-See [stored preset recovery](SPEC.md#stored-preset-recovery) for fallback rules.
+- Temporary files are on the destination volume. LocalFileSystem writes them in one item-replacement folder for each volume, because a sandboxed app can have access to a file but not to its folder. If a volume has no such folder, the temporary file goes next to the target.
+- At commit, the app checks the source identity, size, and modification date again. A replacement of a marked file also needs the expected destination version.
+- Each file commits on its own. A cancellation or a later source-cleanup failure cannot remove a committed output.
+
+### Folder access
+
+The `FolderAccess` port asks the user for folder access. [Destination](SPEC.md#folder-access-in-the-sandboxed-app) describes when. Only ProcessingSession calls the port, so Queue and Pipeline never wait for the user.
+
+- `SiblingOutputFolders` finds the folders that a conversion needs, from each Item's scanned format.
+- `FolderAccessPurpose` tells the panel which message to show.
+- After an Export folder grant, the session sends `exportFolderGranted`. AppModel saves the settings again, and MacPlatform makes a new bookmark.
+- `App/FolderAccessPanel.swift` implements the port with `NSOpenPanel`. Its check uses `access(2)`, which reports sandbox grants, so it needs no sandbox API.
+- Tests and the default wiring use `UnrestrictedFolderAccess`.
+- A refusal does not change commit rules.
+
+## Storage
+
+- MacPlatform maps versioned settings into valid domain values. See [stored preset recovery](SPEC.md#stored-preset-recovery).
+- MacPlatform stores the Export folder two ways: as a security-scoped bookmark, and as the plain path that older builds read. If the bookmark is missing or does not resolve, it uses the path. It keeps security-scoped access to a resolved folder while the process runs. If a resolved bookmark gives no access, the next save makes a new one.
+- `Resources/container-migration.plist` ships only in `UnderpressuredUpdaterFree`. On the first launch, it moves the direct build's preferences file into the sandbox container, so the same keys load there. A bookmark from the direct build gives no sandbox access, so the migrated Export folder works only as a path.
+- LocalFileSystem owns the versioned JSON and the optimization-mark extended attributes. Application commit tokens keep the expected mark bytes without reading them.
+- Keep stored keys, preset IDs, order, starter identifiers, old defaults, and compatible mark payloads.
+- Batch and item execution state is not saved.
 
 ## Native dependencies
 
-`scripts/build-deps.sh` pins jpegli and builds the XCFrameworks. Rust pins live in `rust/up-codecs/Cargo.lock`.
-The build stamp includes native sources and dependency inputs. Framework headers belong under each module directory.
-
-cbindgen generates `rust/up-codecs/include/up_codecs.h`. Commit the header when its API changes.
-Release jpegli buffers with `upj_buffer_free`. Release Rust buffers with `up_buffer_free`.
-
-## Change requirements
-
-Update the [glossary](GLOSSARY.md), [behavior specification](SPEC.md), and this guide when language, behavior, or ownership changes.
-Check construction, public mutation, and storage restoration paths.
-Use the [development workflow](development.md#change-workflow) for validation.
-Manual acceptance remains pending until recorded in the [native interaction checks](development.md#native-gestures-and-voiceover) and [release build checks](release.md#release-build-checks).
+- `scripts/build-deps.sh` pins jpegli and builds the XCFrameworks. `rust/up-codecs/Cargo.lock` pins the Rust crates.
+- The build stamp includes native sources and dependency inputs. Framework headers go in each module directory.
+- cbindgen makes `rust/up-codecs/include/up_codecs.h`. Commit the header when its API changes.
+- Free jpegli buffers with `upj_buffer_free`. Free Rust buffers with `up_buffer_free`.
